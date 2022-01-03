@@ -1,0 +1,7 @@
+name: DoxaRpgSystem
+version: '${project.version}'
+main: first.second.third.doxaplg01.Doxaplg01
+api-version: 1.18
+commands:
+  스탯:
+    description: /stat error
