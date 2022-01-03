@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 
     public Stat s = new Stat();
     public GUI SGui = new GUI();
+    public Attack A = new Attack();
 
     @Override
     public void onEnable() {
@@ -30,12 +32,14 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
-    @Override //스탯 명령어 clrl + o
-    public boolean onCommand(CommandSender player, Command command, String label, String[] args) {
-        if(player instanceof Player){
+    //스탯 명령어 clrl + o
+    public boolean onCommand(CommandSender talker, Command command, String label, String[] args) {
+        if(talker instanceof Player){
             if (label.equals("스탯")) {
-                SGui.StatusG((Player) player);
-                return true;
+                if (label.equals("스탯")) {
+                    SGui.StatusG((Player) talker);
+                    return true;
+                }
             }
         }
         return false;
@@ -47,6 +51,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         if (e.getClickedInventory().equals("[ Status ]")){
             SGui.StatusGui(e);
         }
+    }
+
+    @EventHandler
+    public void EntityAttack(EntityDamageByEntityEvent event){
+        A.Attack(event);
     }
 
     @EventHandler

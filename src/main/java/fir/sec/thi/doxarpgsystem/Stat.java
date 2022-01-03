@@ -18,14 +18,14 @@ public class Stat {
                 filename.createNewFile();
             }
             BufferedWriter w = new BufferedWriter(new FileWriter(filename));
-            w.append("레벨 : 1" + "\r\n" + "잔여 스텟 : 0" + "\r\n" + "경험치 : 0" +
-                    "\r\n" + "최대 경험치 : 0" + "\r\n" + "돈 : 0" + "\r\n" + "기본 체력 : 5" +
-                    "\r\n" + "체력 스텟 : 0" + "\r\n" + "힘 스텟 : 0" + "\r\n" + "명중 스텟 : 0" +
-                    "\r\n" + "민첩 스텟 : 0" + "\r\n" + "지력 스텟 : 0");
+            w.append("레벨:1" + "\r\n" + "잔여 스탯:0" + "\r\n" + "경험치:0" +
+                    "\r\n" + "최대 경험치:0" + "\r\n" + "돈:0" + "\r\n" + "기본 체력:5" +
+                    "\r\n" + "체력 스탯:0" + "\r\n" + "힘 스탯:0" + "\r\n" + "명중 스탯:0" +
+                    "\r\n" + "민첩 스탯:0" + "\r\n" + "지력 스탯:0" + "\r\n" + "방어도:0");
             w.flush();
             w.close();
         }
-        catch (IOException localIoExeption){
+        catch (IOException localIoException){
         }
     }
 
@@ -33,7 +33,7 @@ public class Stat {
         File filename = new File("plugins/RPGStat/Stat/" + player + ".yml");
         File folder_Location1 = new File("plugins/RPGStat/");
         File folder_Location2 = new File("plugins/RPGStat/Stat");
-        long[] stat = new long[11];
+        long[] stat = new long[12];
         try {
             if (!filename.exists()) {
                 folder_Location1.mkdir();
@@ -44,10 +44,10 @@ public class Stat {
             List list = new ArrayList();
             String s;
             while ((s = R.readLine()) != null) {
-                list.add(Long.valueOf(Cutter(s)));
+                list.add(String.valueOf(Cutter(s)));
             }
             R.close();
-            for (int count = 0; count < 10; count++) {
+            for (int count = 0; count < 11; count++) {
                 stat[count] = ((Long) list.get(count)).longValue();
             }
             return stat;
@@ -73,10 +73,11 @@ public class Stat {
                 filename.createNewFile();
             }
             BufferedWriter W = new BufferedWriter(new FileWriter(filename));
-            W.append("레벨 : "+stat[0] + "\r\n" + "잔여 스텟 : "+stat[1] + "\r\n" +
-                    "경험치 : "+stat[2] + "\r\n" + "최대 경험치 : "+stat[3] + "\r\n" + "돈 : "+stat[4] + "\r\n" +
-                    "기본 체력 : "+stat[5] + "\r\n" + "체력 스텟 : "+stat[6] + "\r\n" + "힘 스텟 : "+stat[7] + "\r\n" +
-                    "명중 스텟 : "+stat[8] + "\r\n" + "민첩 스텟 : "+stat[9] + "\r\n" + "지력 스텟 : "+stat[10]);
+            W.append("레벨:"+stat[0] + "\r\n" + "잔여 스탯:"+stat[1] + "\r\n" +
+                    "경험치:"+stat[2] + "\r\n" + "최대 경험치:"+stat[3] + "\r\n" + "돈:"+stat[4] + "\r\n" +
+                    "기본 체력:"+stat[5] + "\r\n" + "체력 스탯:"+stat[6] + "\r\n" + "힘 스탯:"+stat[7] + "\r\n" +
+                    "명중 스탯:"+stat[8] + "\r\n" + "민첩 스탯:"+stat[9] + "\r\n" + "지력 스탯:"+stat[10] + "\r\n" +
+                    "방어도:"+stat[11]);
             W.flush();
             W.close();
         }
@@ -91,7 +92,7 @@ public class Stat {
             setStat(player.getUniqueId().toString(), stat);
         }
         else {
-            player.sendMessage("[Ercanel] : 잔여 스텟이 부족합니다.");
+            player.sendMessage("[Ercanel] : 잔여 스탯이 부족합니다.");
         }
     }
 }

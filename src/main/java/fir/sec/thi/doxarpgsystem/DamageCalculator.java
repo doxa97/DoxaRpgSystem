@@ -18,12 +18,13 @@ public class DamageCalculator {
         return (int) (INT*1.8) + DefaultDamage;
     }
 
-    public int Critical(Long LUK, int damage){
+    public int Critical(Player player, Long LUK, int damage){
         int critical = (int)(LUK/100);
         if (critical > 100) critical = 90;
         if (critical < 0) critical = 0;
         int chance = Random(0, 100);
         if (chance <= critical){
+            player.sendMessage("[ Ercanel ]Critical!");
             return damage*2;
         }
         else {

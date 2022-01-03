@@ -33,7 +33,7 @@ public class GUI {
                 return;
             }
             else{
-                long[] i = new long[10];
+                long[] i = new long[12];
                 i = s.getStat(player.getUniqueId().toString());
                 switch ((ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()))){
                     case "[ 체력 ]" : s.StatUp(i, player, 5); StatusG(player); break;
@@ -47,7 +47,7 @@ public class GUI {
     }
 
     public void StatusG(Player player){
-        long[] i = new long[10];
+        long[] i = new long[12];
         i = s.getStat(player.getUniqueId().toString());
         Inventory status = Bukkit.createInventory(null, 9 ,"[ Status ]");
         Stack("[ 체력 ]", Material.APPLE,0,1, Arrays.asList("현재 체력 스텟 : " + i[6],
