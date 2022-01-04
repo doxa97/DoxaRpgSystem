@@ -1,15 +1,31 @@
 package fir.sec.thi.doxarpgsystem;
 
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.w3c.dom.Entity;
 
 public class Attack {
 
     public Stat s = new Stat();
     public DamageCalculator DC = new DamageCalculator();
+
+    @EventHandler
+    public void RangeAttack(EntityShootBowEvent event){
+        if (event.getEntityType() == EntityType.PLAYER){
+            Player player = (Player) event.getEntity();
+            long[] stat = new long[13];
+            stat = s.getStat(player.getUniqueId().toString());
+            stat[12] = (int)(event.getForce()*100);
+            s.setStat(player.getUniqueId().toString(), stat);
+        }
+    }
 
     public void Attack(EntityDamageByEntityEvent event){
         if (event.getDamager() != null && event.getDamager() instanceof Projectile){
@@ -42,13 +58,14 @@ public class Attack {
     }
 
     public void PlayerDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, Player defenser, int DefaultDamage, String AttackType) {
-        long[] Astat = new long[12];
+        long[] Astat = new long[13];
         Astat = s.getStat(attacker.getUniqueId().toString());
-        long[] Dstat = new long[12];
+        long[] Dstat = new long[13];
         Dstat = s.getStat(defenser.getUniqueId().toString());
         if (AttackType == "활") {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            Damage = (Damage*Astat[12]/100);
             Damage = Damage - Dstat[11];
             event.setDamage(Damage);
             if (Damage <= 0) {
@@ -67,7 +84,7 @@ public class Attack {
     }
 
     public void EntityDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, int DefaultDamage, String AttackType) {
-        long[] Astat = new long[12];
+        long[] Astat = new long[13];
         Astat = s.getStat(attacker.getUniqueId().toString());
         if (AttackType == "활") {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
@@ -88,7 +105,7 @@ public class Attack {
     }
 
     public void PlayerDamageByEntity(EntityDamageByEntityEvent event, Player defenser){
-        long[] stat = new long[12];
+        long[] stat = new long[13];
         stat = s.getStat(defenser.getUniqueId().toString());
         if (event.getDamage() - stat[11] <= 0){
             event.setDamage(0.1);

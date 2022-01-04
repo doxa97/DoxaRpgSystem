@@ -1,5 +1,8 @@
 package fir.sec.thi.doxarpgsystem;
 
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -7,9 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
@@ -17,6 +23,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public Stat s = new Stat();
     public GUI SGui = new GUI();
     public Attack A = new Attack();
+    public Level L = new Level();
 
     @Override
     public void onEnable() {
@@ -48,7 +55,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     @EventHandler
     public void onInvC(InventoryClickEvent e){
         Player player = (Player) e.getWhoClicked();
-        if (e.getClickedInventory().equals("[ Status ]")){
+        if (ChatColor.stripColor(e.getView().getTitle()).equalsIgnoreCase("[ Status ]")){
             SGui.StatusGui(e);
         }
     }
@@ -61,5 +68,14 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     @EventHandler
     public void PlayerJoin(PlayerJoinEvent j){
         s.CreateNewStat(j.getPlayer().getUniqueId().toString());
+    }
+
+    @EventHandler
+    public void RangeAttack(EntityShootBowEvent event){
+        A.RangeAttack(event);
+    }
+    @EventHandler
+    public void MK(EntityDeathEvent event){
+        L.MonsterKill(event);
     }
 }
