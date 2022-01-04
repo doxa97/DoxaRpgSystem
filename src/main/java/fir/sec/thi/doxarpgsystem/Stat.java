@@ -1,7 +1,5 @@
 package fir.sec.thi.doxarpgsystem;
 
-import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 
 import java.io.*;

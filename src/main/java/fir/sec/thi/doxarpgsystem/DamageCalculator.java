@@ -15,7 +15,7 @@ public class DamageCalculator {
         return (int) (DEX*2) + DefaultDamage;
     }
     public int CombatMagicDamage(Player player, int DefaultDamage, long INT){
-        return (int) (INT*1.8) + DefaultDamage;
+        return (int) (INT*1.3) + DefaultDamage;
     }
 
     public int Critical(Player player, Long LUK, int damage){
