@@ -19,6 +19,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Objects;
+
 
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
 
@@ -32,7 +34,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin startup logic
         getLogger().info("Doxa On!");
         getServer().getPluginManager().registerEvents(this, this);
-        getCommand("스탯").setExecutor(this);
+        Objects.requireNonNull(getCommand("스탯")).setExecutor(this);
     }
 
     @Override
@@ -44,21 +46,19 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     @EventHandler
     public void loadPS(PlayerMoveEvent p){
         Player player = p.getPlayer();
-        long[] stat = new long[13];
+        long[] stat;
         stat = s.getStat(player.getUniqueId().toString());
-        player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(stat[5] + stat[6]*5);
-        player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.1 + stat[9]*0.001);
+        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[5] + stat[6]*5);
+        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.1 + stat[9]*0.001);
 
     }
 
-    //스탯 명령어 clrl + o
+    //스탯 명령어 ctrl + o
     public boolean onCommand(CommandSender talker, Command command, String label, String[] args) {
         if(talker instanceof Player){
             if (label.equals("스탯")) {
-                if (label.equals("스탯")) {
-                    SGui.StatusG((Player) talker);
-                    return true;
-                }
+                SGui.StatusG((Player) talker);
+                return true;
             }
             if (label.equals("수표")){
                 if (args.length != 2){
@@ -76,6 +76,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }
                 ItemStack paper = new ItemStack(Material.PAPER);
                 ItemMeta im = paper.getItemMeta();
+                assert im != null;
                 im.setDisplayName(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE +args[0] + "골드");
                 paper.setItemMeta(im);
                 for (int i = 0; i < num; i++){
@@ -99,7 +100,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public void RangeAttack(EntityShootBowEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             Player player = (Player) event.getEntity();
-            long[] stat = new long[13];
+            long[] stat;
             stat = s.getStat(player.getUniqueId().toString());
             stat[12] = (int) (event.getForce());
             s.setStat(player.getUniqueId().toString(), stat);
