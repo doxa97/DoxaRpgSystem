@@ -1,12 +1,15 @@
 package fir.sec.thi.doxarpgsystem;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -115,5 +118,14 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     @EventHandler
     public void MK(EntityDeathEvent event){
         L.MonsterKill(event);
+    }
+
+    public LivingEntity SpawnRPGEntity(Location location, World world, EntityType entityType, double speed, double health, String name) {
+        LivingEntity entity = (LivingEntity) world.spawnEntity(location, entityType);
+        entity.setCustomName(name);
+        entity.setCustomNameVisible(true);
+        Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
+        Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(health);
+        return entity;
     }
 }
