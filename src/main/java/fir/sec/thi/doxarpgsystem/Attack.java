@@ -1,5 +1,6 @@
 package fir.sec.thi.doxarpgsystem;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -75,7 +76,6 @@ public class Attack {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = (Damage*Astat[12])*100;
-            Damage = Damage;
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
@@ -90,9 +90,6 @@ public class Attack {
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
-            }
-            else {
-                attacker.sendMessage(event.getDamage() + "");
             }
         }
     }
@@ -111,11 +108,11 @@ public class Attack {
     public void SendMessage(Player player){
         int a = DC.Random(1, 5);
         switch (a){
-            case 5: player.sendMessage("[ Ercanel ]상대방의 방어력이 높습니다...!");
-            case 4: player.sendMessage("[ Ercanel ]상대방의 방어 자세를 뚫을 수 없습니다...!");
-            case 3: player.sendMessage("[ Ercanel ]상대방이 너무 견고합니다...!");
-            case 2: player.sendMessage("[ Ercanel ]검이 상대의 갑옷에 팅겼습니다...!");
-            case 1: player.sendMessage("[ Ercanel ]상대의 갑옷보다 무기가 무딘 것 같습니다...!");
+            case 5: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어력이 높습니다...!");
+            case 4: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어 자세를 뚫을 수 없습니다...!");
+            case 3: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방이 너무 견고합니다...!");
+            case 2: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"검이 상대의 갑옷에 팅겼습니다...!");
+            case 1: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대의 갑옷보다 무기가 무딘 것 같습니다...!");
         }
     }
 

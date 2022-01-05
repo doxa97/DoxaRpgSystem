@@ -53,21 +53,21 @@ public class GUI {
         long[] i = new long[13];
         i = s.getStat(player.getUniqueId().toString());
         Inventory status = Bukkit.createInventory(null, 9 ,"[ Status ]");
-        Stack("[ 체력 ]", Material.APPLE,0,1, Arrays.asList("현재 체력 스탯 : " + i[6],
-                "현재 여유 스탯 : " + i[1],
-                "추가 체력 : " + i[6]*5, "추가 재생력 : " + i[6]*2),0,status);
-        Stack("[ 힘 ]", Material.IRON_SWORD,0,1, Arrays.asList("현재 힘 스탯 : " + i[7],
-                "현재 여유 스탯 : " + i[1],
-                "추가 근접 물리 공격력 : " + i[7]*1.5),2,status);
-        Stack("[ 명중률 ]", Material.BOW,0,1, Arrays.asList("현재 명중률 스탯 : " + i[8],
-                "현재 여유 스탯 : " + i[1],
-                "추가 원거리 물리 공격력 : " + i[8]*2),4,status);
-        Stack("[ 민첩 ]", Material.GOLDEN_BOOTS,0,1, Arrays.asList("현재 민첩 스탯 : " + i[9],
-                "현재 여유 스탯 : " + i[1],
-                "추가 이동속도 : " + i[9]*0.001, "추가 치명타 확률 : " + i[9]*0.1 + "%"),6,status);
-        Stack("[ 마력 ]", Material.BLAZE_POWDER,0,1, Arrays.asList("현재 마력 스탯 : " + i[10],
-                "현재 여유 스탯 : " + i[1],
-                "추가 마법 공격력 : " + i[10]*1.3),8,status);
+        Stack(ChatColor.RED+"[ 체력 ]", Material.APPLE,0,1, Arrays.asList(ChatColor.GRAY+"현재 체력 스탯 : " + i[6],
+                ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
+                ChatColor.GRAY+"추가 체력 : " + i[6]*5, ChatColor.GRAY+"추가 재생력 : " + i[6]*2),0,status);
+        Stack(ChatColor.DARK_RED+"[ 힘 ]", Material.IRON_SWORD,0,1, Arrays.asList(ChatColor.GRAY+"현재 힘 스탯 : " + i[7],
+                ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
+                ChatColor.GRAY+"추가 근접 물리 공격력 : " + i[7]*1.5),2,status);
+        Stack(ChatColor.AQUA+"[ 명중률 ]", Material.BOW,0,1, Arrays.asList(ChatColor.GRAY+"현재 명중률 스탯 : " + i[8],
+                ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
+                ChatColor.GRAY+"추가 원거리 물리 공격력 : " + i[8]*2),4,status);
+        Stack(ChatColor.GOLD+"[ 민첩 ]", Material.GOLDEN_BOOTS,0,1, Arrays.asList(ChatColor.GRAY+"현재 민첩 스탯 : " + i[9],
+                ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
+                ChatColor.GRAY+"추가 이동속도 : " + i[9]*0.001, "추가 치명타 확률 : " + i[9]*0.1 + "%"),6,status);
+        Stack(ChatColor.LIGHT_PURPLE+"[ 마력 ]", Material.BLAZE_POWDER,0,1, Arrays.asList(ChatColor.GRAY+"현재 마력 스탯 : " + i[10],
+                ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
+                ChatColor.GRAY+"추가 마법 공격력 : " + i[10]*1.3),8,status);
         player.openInventory(status);
 
     }

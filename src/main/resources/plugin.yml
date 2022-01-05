@@ -5,3 +5,5 @@ api-version: 1.18
 commands:
   스탯:
     description: /stat error
+  수표:
+    description: /수표 [금액] [수량]

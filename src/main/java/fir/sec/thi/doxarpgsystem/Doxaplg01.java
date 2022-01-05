@@ -1,6 +1,7 @@
 package fir.sec.thi.doxarpgsystem;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,7 +16,14 @@ import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Stack;
 
 
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
@@ -58,6 +66,29 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     return true;
                 }
             }
+            if (label.equals("수표")){
+                if (args.length != 2){
+                    talker.sendMessage("more");
+                    return true;
+                }
+                int money = 0;
+                int num = 0;
+                Player p = (Player) talker;
+                try {
+                    money = Integer.parseInt(args[0]);
+                    num = Integer.parseInt(args[1]);
+                }catch (Exception e){
+                    p.sendMessage("Error");
+                }
+                ItemStack paper = new ItemStack(Material.PAPER);
+                ItemMeta im = paper.getItemMeta();
+                im.setDisplayName(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE +args[0] + "골드");
+                paper.setItemMeta(im);
+                for (int i = 0; i < num; i++){
+                    p.getInventory().addItem(paper);
+                }
+
+            }
         }
         return false;
     }
@@ -85,12 +116,6 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public void EntityAttack(EntityDamageByEntityEvent event){
         A.Attack(event);
     }
-
-    @EventHandler
-    public void PlayerJoin(PlayerJoinEvent j){
-        s.CreateNewStat(j.getPlayer().getUniqueId().toString());
-    }
-
 
     @EventHandler
     public void MK(EntityDeathEvent event){

@@ -1,5 +1,6 @@
 package fir.sec.thi.doxarpgsystem;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.io.*;
@@ -89,7 +90,7 @@ public class Stat {
             stat[1] = stat[1] - 1;
             setStat(player.getUniqueId().toString(), stat);
         } else {
-            player.sendMessage("[Ercanel] : 잔여 스탯이 부족합니다.");
+            player.sendMessage(ChatColor.DARK_AQUA+"[Ercanel]"+ChatColor.WHITE+"잔여 스탯이 부족합니다.");
         }
     }
 
@@ -101,8 +102,8 @@ public class Stat {
                 stat[2] = stat[2] - stat[3];
                 stat[0] = stat[0] + 1;
                 stat[3] = (long) (stat[0] * 2) + stat[3];
-                stat[1] = stat[1] + 5;
-                player.sendMessage("[ Ercanel ]Level Up!");
+                stat[1] = stat[1] + 3;
+                player.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ChatColor.WHITE+"Level Up!");
                 setStat(player.getUniqueId().toString(), stat);
             }
         }
