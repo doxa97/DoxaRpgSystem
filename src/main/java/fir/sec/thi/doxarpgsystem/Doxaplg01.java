@@ -64,30 +64,67 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 return true;
             }
             if (label.equals("수표")){
-                if (args.length != 2){
-                    talker.sendMessage("more");
+                if (args.length == 0){
+                    talker.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE + "/수표 [금액] [개수]");
                     return true;
                 }
-                int money = 0;
-                int num = 0;
-                Player p = (Player) talker;
-                try {
-                    money = Integer.parseInt(args[0]);
-                    num = Integer.parseInt(args[1]);
-                }catch (Exception e){
-                    p.sendMessage("Error");
+                if (args.length == 1){
+                    int money = 0;;
+                    Player p = (Player) talker;
+                    try {
+                        money = Integer.parseInt(args[0]);;
+                    }catch (Exception e){
+                        p.sendMessage("Error");
+                    }
+                    if (money < 0){
+                        talker.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE + "음수는 제공되지 않습니다 고객님 ^^7");
+                    }
+                    else {
+                        ItemStack paper = new ItemStack(Material.PAPER);
+                        ItemMeta im = paper.getItemMeta();
+                        assert im != null;
+                        im.setDisplayName(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE +args[0] + "골드");
+                        paper.setItemMeta(im);
+                        p.getInventory().addItem(paper);
+                    }
                 }
-                ItemStack paper = new ItemStack(Material.PAPER);
-                ItemMeta im = paper.getItemMeta();
-                assert im != null;
-                im.setDisplayName(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE +args[0] + "골드");
-                paper.setItemMeta(im);
-                for (int i = 0; i < num; i++){
-                    p.getInventory().addItem(paper);
+                if (args.length == 2){
+                    int money = 0;
+                    int num = 0;
+                    Player p = (Player) talker;
+                    try {
+                        money = Integer.parseInt(args[0]);
+                        num = Integer.parseInt(args[1]);
+                    }catch (Exception e){
+                        p.sendMessage("Error");
+                    }
+                    if (money < 0){
+                        talker.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE + "음수는 제공되지 않습니다 고객님 ^^7");
+                    }
+                    else {
+                        ItemStack paper = new ItemStack(Material.PAPER);
+                        ItemMeta im = paper.getItemMeta();
+                        assert im != null;
+                        im.setDisplayName(ChatColor.DARK_AQUA+"[ Ercanel ]"+ ChatColor.WHITE +args[0] + "골드");
+                        paper.setItemMeta(im);
+                        for (int i = 0; i < num; i++) {
+                            p.getInventory().addItem(paper);
+                        }
+                    }
                 }
-
             }
-        }
+            if (label.equals("mobspawn")){
+                if (args.length !=6) {
+                    talker.sendMessage("Error");
+                    return true;
+                }
+                EntityType e = EntityType.valueOf(args[2]);
+                int s = Integer.parseInt(args[3]);
+                int h = Integer.parseInt(args[5]);
+                int a = Integer.parseInt(args[4]);
+                SpawnRPGEntity(((Player) talker).getLocation(), ((Player) talker).getWorld(), e, s, h, a,ChatColor.DARK_RED+"LV."+args[1]+" "+ChatColor.GRAY+args[0]);
+                }
+            }
         return false;
     }
 
@@ -120,12 +157,14 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         L.MonsterKill(event);
     }
 
-    public LivingEntity SpawnRPGEntity(Location location, World world, EntityType entityType, double speed, double health, String name) {
+    public LivingEntity SpawnRPGEntity(Location location, World world, EntityType entityType, double speed, double attack, double health, String name) {
         LivingEntity entity = (LivingEntity) world.spawnEntity(location, entityType);
         entity.setCustomName(name);
         entity.setCustomNameVisible(true);
-        Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
+        Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed*0.2);
         Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(health);
+        Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).setBaseValue(attack);
+        entity.setHealth(health);
         return entity;
     }
 }

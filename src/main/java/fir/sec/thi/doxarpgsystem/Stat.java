@@ -2,10 +2,13 @@ package fir.sec.thi.doxarpgsystem;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.bukkit.inventory.EquipmentSlot.CHEST;
 
 public class Stat {
     public void CreateNewStat(String player) {

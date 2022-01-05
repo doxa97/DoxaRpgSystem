@@ -7,3 +7,6 @@ commands:
     description: /stat error
   수표:
     description: /수표 [금액] [수량]
+  mobspawn:
+    description: /mobspawn Name Level EntityType Speed Attack Health
+    permission: your
