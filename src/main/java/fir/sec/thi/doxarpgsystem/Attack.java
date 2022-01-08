@@ -5,7 +5,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+
+import java.util.Objects;
 
 public class Attack {
 
@@ -47,7 +51,7 @@ public class Attack {
         Astat = s.getStat(attacker.getUniqueId().toString());
         long[] Dstat = new long[13];
         Dstat = s.getStat(defender.getUniqueId().toString());
-        if (AttackType == "B") {
+        if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage - Dstat[11];
@@ -57,7 +61,7 @@ public class Attack {
             }
         }
         else {
-               if (AttackType == "A") {
+               if (Objects.equals(AttackType, "A")) {
                 long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
                 Damage = DC.Critical(attacker, Astat[9], (int) Damage);
                 Damage = Damage - Dstat[11];
@@ -69,13 +73,24 @@ public class Attack {
         }
     }
 
+    @EventHandler
+    public void RangeAttack(EntityShootBowEvent event) {
+        if (event.getEntityType() == EntityType.PLAYER) {
+            Player player = (Player) event.getEntity();
+            long[] stat;
+            stat = s.getStat(player.getUniqueId().toString());
+            stat[12] = (int) (event.getForce()*100);
+            s.setStat(player.getUniqueId().toString(), stat);
+        }
+    }
+
     public void EntityDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, int DefaultDamage, String AttackType) {
-        long[] Astat = new long[13];
+        long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
-        if (AttackType == "B") {
+        if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-            Damage = (Damage*Astat[12])*100;
+            Damage = (Damage*Astat[12]);
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
@@ -84,7 +99,7 @@ public class Attack {
                 attacker.sendMessage(Damage + "");
             }
 
-        } else if (AttackType == "A") {
+        } else if (Objects.equals(AttackType, "A")) {
             long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             event.setDamage(Damage);
@@ -108,11 +123,11 @@ public class Attack {
     public void SendMessage(Player player){
         int a = DC.Random(1, 5);
         switch (a){
-            case 5: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어력이 높습니다...!");
-            case 4: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어 자세를 뚫을 수 없습니다...!");
-            case 3: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방이 너무 견고합니다...!");
-            case 2: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"검이 상대의 갑옷에 팅겼습니다...!");
-            case 1: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대의 갑옷보다 무기가 무딘 것 같습니다...!");
+            case 5: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어력이 높습니다...!"); break;
+            case 4: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어 자세를 뚫을 수 없습니다...!"); break;
+            case 3: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방이 너무 견고합니다...!"); break;
+            case 2: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"검이 상대의 갑옷에 팅겼습니다...!"); break;
+            case 1: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대의 갑옷보다 무기가 무딘 것 같습니다...!"); break;
         }
     }
 
