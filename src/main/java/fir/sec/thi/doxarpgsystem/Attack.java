@@ -47,13 +47,14 @@ public class Attack {
     }
 
     public void PlayerDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, Player defender, int DefaultDamage, String AttackType) {
-        long[] Astat = new long[13];
+        long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
-        long[] Dstat = new long[13];
+        long[] Dstat;
         Dstat = s.getStat(defender.getUniqueId().toString());
         if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            Damage = Damage + Astat[14];
             Damage = Damage - Dstat[11];
             event.setDamage(Damage);
             if (Damage <= 0) {
@@ -64,6 +65,7 @@ public class Attack {
                if (Objects.equals(AttackType, "A")) {
                 long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
                 Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+                Damage = Damage + Astat[13];
                 Damage = Damage - Dstat[11];
                 event.setDamage(Damage);
                 if (Damage <= 0) {
@@ -90,6 +92,7 @@ public class Attack {
         if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            Damage = Damage + Astat[14];
             Damage = (Damage*Astat[12]);
             event.setDamage(Damage);
             if (Damage <= 0) {
@@ -102,6 +105,7 @@ public class Attack {
         } else if (Objects.equals(AttackType, "A")) {
             long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            Damage = Damage + Astat[13];
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
@@ -110,7 +114,7 @@ public class Attack {
     }
 
     public void PlayerDamageByEntity(EntityDamageByEntityEvent event, Player defender){
-        long[] stat = new long[13];
+        long[] stat;
         stat = s.getStat(defender.getUniqueId().toString());
         if (event.getDamage() - stat[11] <= 0){
             event.setDamage(0.1);

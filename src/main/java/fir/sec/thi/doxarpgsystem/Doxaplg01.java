@@ -53,8 +53,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         Player player = p.getPlayer();
         long[] stat;
         stat = s.getStat(player.getUniqueId().toString());
-        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[5] + stat[6] * 5);
-        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.1 + stat[9] * 0.001);
+        stat[18] = (long) (0.1 + stat[9] * 0.001);
+        stat[17] = stat[5] + stat[6] * 5;
+        stat[11] = stat[19] + stat[200] + stat[21] + stat [22];
+        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[17]);
+        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(stat[18]);
 
     }
 

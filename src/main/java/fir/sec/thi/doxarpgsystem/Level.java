@@ -5,6 +5,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import java.util.Objects;
+
 public class Level {
 
     public Stat s = new Stat();
@@ -12,12 +14,12 @@ public class Level {
     public void MonsterKill(EntityDeathEvent event){
         if (event.getEntity().getLastDamageCause().getCause().toString() == "ENTITY_ATTACK"){
             if (event.getEntity().getKiller() != null){
-                if (Bukkit.getServer().getPlayer((event.getEntity().getKiller().getName())).isOnline() == true){
+                if (Objects.requireNonNull(Bukkit.getServer().getPlayer((event.getEntity().getKiller().getName()))).isOnline()){
                     Player player = event.getEntity().getKiller();
                     if (event.getEntityType() == EntityType.SILVERFISH){
                         if (event.getEntity().getName().contains("LV.1"))
                             event.setDroppedExp(0);
-                            long[] stat = new long[13];
+                            long[] stat;
                             stat = s.getStat(player.getUniqueId().toString());
                             stat[2] = stat[2] + 1;
                             s.setStat(player.getUniqueId().toString(), stat);
