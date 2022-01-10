@@ -12,7 +12,7 @@ public class Level {
     public Stat s = new Stat();
 
     public void MonsterKill(EntityDeathEvent event){
-        if (event.getEntity().getLastDamageCause().getCause().toString() == "ENTITY_ATTACK"){
+        if (Objects.equals(Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause().toString(), "ENTITY_ATTACK")){
             if (event.getEntity().getKiller() != null){
                 if (Objects.requireNonNull(Bukkit.getServer().getPlayer((event.getEntity().getKiller().getName()))).isOnline()){
                     Player player = event.getEntity().getKiller();
