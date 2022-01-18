@@ -130,7 +130,7 @@ public class Attack {
             case 5: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어력이 높습니다...!"); break;
             case 4: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방의 방어 자세를 뚫을 수 없습니다...!"); break;
             case 3: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대방이 너무 견고합니다...!"); break;
-            case 2: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"검이 상대의 갑옷에 팅겼습니다...!"); break;
+            case 2: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"무기가 상대의 갑옷에 팅겼습니다...!"); break;
             case 1: player.sendMessage(ChatColor.DARK_AQUA +"[ Ercanel ]"+ChatColor.WHITE+"상대의 갑옷보다 무기가 무딘 것 같습니다...!"); break;
         }
     }

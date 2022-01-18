@@ -13,15 +13,18 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 
@@ -31,6 +34,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public GUI SGui = new GUI();
     public Attack A = new Attack();
     public Level L = new Level();
+    public DamageCalculator DC = new DamageCalculator();
 
     @Override
     public void onEnable() {
@@ -73,10 +77,12 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     stat[14] = Long.parseLong(s1.replace("원거리 공격력 : ", ""));
                 }if (s1.contains("마법")) {
                     stat[15] = Long.parseLong(s1.replace("마법 공격력 : ", ""));
+                }if (s2.contains("치명타")){
+                    stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
                 }
+                s.setStat(player.getUniqueId().toString(), stat);
             }
         }
-
         if (player.getEquipment() == null || Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR ||
                 ! player.getEquipment().getHelmet().hasItemMeta()){
             stat[19] = 0;
@@ -97,6 +103,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }if (string.length() >= s3.length() && string.substring(0, s3.length()).equalsIgnoreCase(s3)) {
                     stat[27] = Long.parseLong(s3.replace("이동 속도 증가 : ", ""));
                 }
+                s.setStat(player.getUniqueId().toString(), stat);
             }
         }
         if (player.getEquipment() == null || Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR ||
@@ -119,6 +126,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }else if (string.length() >= s3.length() && string.substring(0, s3.length()).equalsIgnoreCase(s3)) {
                     stat[28] = Long.parseLong(s3.replace("이동 속도 증가 : ", ""));
                 }
+                s.setStat(player.getUniqueId().toString(), stat);
             }
         }
         if (player.getEquipment() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
@@ -141,6 +149,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }else if (string.length() >= s3.length() && string.substring(0, s3.length()).equalsIgnoreCase(s3)) {
                     stat[29] = Long.parseLong(s3.replace("이동 속도 증가 : ", ""));
                 }
+                s.setStat(player.getUniqueId().toString(), stat);
             }
         }
         if (player.getEquipment() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
@@ -163,6 +172,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     int len = s3.length();
                     stat[30] = Long.parseLong(s3.replace("이동 속도 증가 : ", ""));
                 }
+                s.setStat(player.getUniqueId().toString(), stat);
             }
         }
         stat[18] = (long) (0.1 + stat[9] * 0.001)+stat[27]+stat[28]+stat[29]+stat[30];
@@ -246,6 +256,58 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                                         //    0    1      2   3   4     5
                 }
                 else {
+                    if (args[2].equals("보조")){
+                        switch (args[3]){
+                            case "일반":{
+                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
+                                ItemMeta tool = lt.getItemMeta();
+                                Objects.requireNonNull(tool).setDisplayName(args[0]);
+                                if (tool.getDisplayName().contains("_")){
+                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
+                                }
+                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 일반 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
+                                lt.setItemMeta(tool);
+                                ((Player) talker).getInventory().addItem(lt);
+                                return false;
+                            }
+                            case "레어":{
+                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
+                                ItemMeta tool = lt.getItemMeta();
+                                Objects.requireNonNull(tool).setDisplayName(args[0]);
+                                if (tool.getDisplayName().contains("_")){
+                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
+                                }
+                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 레어 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
+                                lt.setItemMeta(tool);
+                                ((Player) talker).getInventory().addItem(lt);
+                                return false;
+                            }
+                            case "에픽":{
+                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
+                                ItemMeta tool = lt.getItemMeta();
+                                Objects.requireNonNull(tool).setDisplayName(args[0]);
+                                if (tool.getDisplayName().contains("_")){
+                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
+                                }
+                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 에픽 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
+                                lt.setItemMeta(tool);
+                                ((Player) talker).getInventory().addItem(lt);
+                                return false;
+                            }
+                            case "전설":{
+                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
+                                ItemMeta tool = lt.getItemMeta();
+                                Objects.requireNonNull(tool).setDisplayName(args[0]);
+                                if (tool.getDisplayName().contains("_")){
+                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
+                                }
+                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 전설 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
+                                lt.setItemMeta(tool);
+                                ((Player) talker).getInventory().addItem(lt);
+                                return false;
+                            }
+                        }
+                    }
                     if (args[2].equals("무기")){
                         switch (args[3]) {
                             case "일반": {
@@ -463,6 +525,42 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             }
         }
         return false;
+    }
+
+    @EventHandler
+    public void RightClick(PlayerInteractEvent e){
+        Player p = e.getPlayer();
+        Action a = e.getAction();
+        if (a == Action.LEFT_CLICK_AIR) {
+            if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.STICK) {
+                if (p.getEquipment().getItemInOffHand().getType() == Material.BLAZE_ROD) {
+
+                } else {
+                    p.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "마법서를 왼 손에 들어주세요.");
+                }
+            }
+        }if(a == Action.RIGHT_CLICK_AIR){
+            if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.BLAZE_ROD){
+                ArrayList List = new ArrayList(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
+                if (List.contains("미감정")){
+                    if (List.contains("일반")){
+                        p.getEquipment().getItemInMainHand().getItemMeta().getLore().clear();
+                        int r = DC.Random(1, 3);
+                        switch (r) {
+                            case 1: {
+                                p.getEquipment().getItemInMainHand().getItemMeta().setLore(Collections.singletonList(ChatColor.WHITE+"[ 일반 마법 ]" +ChatColor.RED+" 불타는 총알"));
+                            }
+                            case 2: {
+                                p.getEquipment().getItemInMainHand().getItemMeta().setLore(Collections.singletonList(ChatColor.WHITE+"[ 일반 마법 ]" +ChatColor.DARK_AQUA+" 정전기 방출"));
+                            }
+                            case 3: {
+                                p.getEquipment().getItemInMainHand().getItemMeta().setLore(Collections.singletonList(ChatColor.WHITE+"[ 일반 마법 ]" +ChatColor.GREEN+" 날카로운 바람"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
