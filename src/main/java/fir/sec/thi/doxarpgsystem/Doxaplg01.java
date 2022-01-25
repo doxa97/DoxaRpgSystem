@@ -1,6 +1,5 @@
 package fir.sec.thi.doxarpgsystem;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -26,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
@@ -536,9 +534,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         Action a = e.getAction();
         if (a == Action.LEFT_CLICK_AIR) {
             if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.STICK) {
-                if (p.getEquipment().getItemInOffHand().getType() == Material.BLAZE_ROD) {
-
-                } else {
+                if (p.getEquipment().getItemInOffHand().getType() != Material.BLAZE_ROD) {
                     p.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "마법서를 왼 손에 들어주세요.");
                 }
             }
@@ -606,9 +602,9 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 }
 
 class RPGItem {
-    private ItemStack itemStack;
+    private final ItemStack itemStack;
 
-    public void RPGItem(ItemStack itemStack) {
+    public RPGItem(ItemStack itemStack) {
         this.itemStack = itemStack;
     }
 
@@ -630,14 +626,16 @@ class RPGItem {
      */
     public String get_attack_type() {
         List<String> lore = Objects.requireNonNull(itemStack.getItemMeta()).getLore();
-        if (listcontains("근접", lore)) {
-            return "근접";
-        }
-        if (listcontains("원거리", lore)) {
-            return "원거리";
-        }
-        if (listcontains("마법", lore)) {
-            return "마법";
+        if (lore != null) {
+            if (listcontains("근접", lore)) {
+                return "근접";
+            }
+            if (listcontains("원거리", lore)) {
+                return "원거리";
+            }
+            if (listcontains("마법", lore)) {
+                return "마법";
+            }
         }
         return "null";
     }
@@ -650,4 +648,5 @@ class RPGItem {
         }
         return false;
     }
+
 }
