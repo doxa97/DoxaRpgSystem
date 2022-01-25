@@ -1,5 +1,6 @@
 package fir.sec.thi.doxarpgsystem;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,8 +25,8 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.units.qual.A;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
@@ -50,8 +51,6 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
-    private String lore;
-
     @EventHandler
     public void loadPS(PlayerMoveEvent p) {
         Player player = p.getPlayer();
@@ -66,6 +65,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             return;
         } else {
             ItemStack w = Objects.requireNonNull(player.getEquipment()).getItemInMainHand();
+            //noinspection rawtypes
             ArrayList lorelistw = (ArrayList) Objects.requireNonNull(w.getItemMeta()).getLore();
             for (Object string : Objects.requireNonNull(lorelistw)){
                 player.sendMessage(String.valueOf(lorelistw));
@@ -73,11 +73,14 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 String s2 = String.valueOf(w.getItemMeta().getLore().contains("치명타 확률"));
                 if (s1.contains("근접")) {
                     stat[13] = Long.parseLong(s1.replace("근접 공격력 : ", ""));
-                }if (s1.contains("원거리")) {
+                }
+                if (s1.contains("원거리")) {
                     stat[14] = Long.parseLong(s1.replace("원거리 공격력 : ", ""));
-                }if (s1.contains("마법")) {
+                }
+                if (s1.contains("마법")) {
                     stat[15] = Long.parseLong(s1.replace("마법 공격력 : ", ""));
-                }if (s2.contains("치명타")){
+                }
+                if (s2.contains("치명타")){
                     stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
                 }
                 s.setStat(player.getUniqueId().toString(), stat);
@@ -541,7 +544,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             }
         }if(a == Action.RIGHT_CLICK_AIR){
             if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.BLAZE_ROD){
-                ArrayList List = new ArrayList(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
+                ArrayList<String> List = new ArrayList<>(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
                 if (List.contains("미감정")){
                     if (List.contains("일반")){
                         p.getEquipment().getItemInMainHand().getItemMeta().getLore().clear();
@@ -600,4 +603,51 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         entity.setHealth(health);
     }
 
+}
+
+class RPGItem {
+    private ItemStack itemStack;
+
+    public void RPGItem(ItemStack itemStack) {
+        this.itemStack = itemStack;
+    }
+
+    /*
+                    String s1 = String.valueOf(Objects.requireNonNull(w.getItemMeta().getLore()).contains("공격력"));
+                String s2 = String.valueOf(w.getItemMeta().getLore().contains("치명타 확률"));
+                if (s1.contains("근접")) {
+                    stat[13] = Long.parseLong(s1.replace("근접 공격력 : ", ""));
+                }
+                if (s1.contains("원거리")) {
+                    stat[14] = Long.parseLong(s1.replace("원거리 공격력 : ", ""));
+                }
+                if (s1.contains("마법")) {
+                    stat[15] = Long.parseLong(s1.replace("마법 공격력 : ", ""));
+                }
+                if (s2.contains("치명타")){
+                    stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
+                }
+     */
+    public String get_attack_type() {
+        List<String> lore = Objects.requireNonNull(itemStack.getItemMeta()).getLore();
+        if (listcontains("근접", lore)) {
+            return "근접";
+        }
+        if (listcontains("원거리", lore)) {
+            return "원거리";
+        }
+        if (listcontains("마법", lore)) {
+            return "마법";
+        }
+        return "null";
+    }
+
+    private Boolean listcontains(String string, List<String> stringList) {
+        for (String i: stringList) {
+            if (Objects.equals(string, i)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
