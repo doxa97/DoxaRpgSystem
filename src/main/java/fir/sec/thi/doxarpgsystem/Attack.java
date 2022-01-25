@@ -8,6 +8,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.potion.Potion;
 
 import java.util.Objects;
 
@@ -25,6 +26,17 @@ public class Attack {
                 }
                 if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
                     EntityDamageByPlayer(event,(Player) p.getShooter(),(int)event.getDamage(),"B");
+                }
+                if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
+                    PlayerDamageByEntity(event,(Player)event.getEntity());
+                }
+            }
+            else if (p.getType() == EntityType.SPLASH_POTION){
+                if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player){
+                    PlayerDamageByPlayer(event,(Player)p.getShooter(),(Player) event.getEntity(),(int)event.getDamage(),"M");
+                }
+                if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
+                    EntityDamageByPlayer(event,(Player) p.getShooter(),(int)event.getDamage(),"M");
                 }
                 if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
                     PlayerDamageByEntity(event,(Player)event.getEntity());
@@ -62,7 +74,7 @@ public class Attack {
             }
         }
         else {
-               if (Objects.equals(AttackType, "A")) {
+            if (Objects.equals(AttackType, "A")) {
                 long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
                 Damage = DC.Critical(attacker, Astat[9], (int) Damage);
                 Damage = Damage + Astat[13];
@@ -70,6 +82,17 @@ public class Attack {
                 event.setDamage(Damage);
                 if (Damage <= 0) {
                     SendMessage(attacker);
+                }
+            }
+            else {
+                if (Objects.equals(AttackType, "M")) {
+                    long Damage = DC.CombatMagicDamage(attacker, DefaultDamage, Astat[10]);
+                    Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+                    Damage = Damage + Astat[13];
+                    event.setDamage(Damage);
+                    if (Damage <= 0) {
+                        SendMessage(attacker);
+                    }
                 }
             }
         }
@@ -109,6 +132,17 @@ public class Attack {
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
+            }
+        }
+        else {
+            if (Objects.equals(AttackType, "M")) {
+                long Damage = DC.CombatMagicDamage(attacker, DefaultDamage, Astat[10]);
+                Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+                Damage = Damage + Astat[13];
+                event.setDamage(Damage);
+                if (Damage <= 0) {
+                    SendMessage(attacker);
+                }
             }
         }
     }
