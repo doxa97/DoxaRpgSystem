@@ -629,15 +629,29 @@ class RPGItem {
         if (lore != null) {
             if (listcontains("근접", lore)) {
                 return "근접";
-            }
-            if (listcontains("원거리", lore)) {
+            } else if (listcontains("원거리", lore)) {
                 return "원거리";
-            }
-            if (listcontains("마법", lore)) {
+            } else if (listcontains("마법", lore)) {
                 return "마법";
             }
         }
         return "null";
+    }
+
+    public String get_attack_value() {
+        String attackType = get_attack_type();
+        String string = "null";
+        if (!Objects.equals(attackType, "null")) {
+            List<String> lore = Objects.requireNonNull(itemStack.getItemMeta()).getLore();
+            if (lore != null) {
+                for (String i: lore) {
+                    if (i.startsWith(attackType)) {
+                        string = i.substring(attackType.length());
+                    }
+                }
+            }
+        }
+        return string;
     }
 
     private Boolean listcontains(String string, List<String> stringList) {
