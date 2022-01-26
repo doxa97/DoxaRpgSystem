@@ -110,8 +110,8 @@ public class Stat {
             } else {
                 stat[2] = stat[2] - stat[3];
                 stat[0] = stat[0] + 1;
-                stat[3] = (long) (stat[0] * 2) + stat[3];
-                stat[1] = stat[1] + 3;
+                stat[3] = (stat[0] * 2) + stat[3];
+                stat[1] = (long) ((stat[1] * 1.5) + 3);
                 player.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ChatColor.WHITE+"Level Up!");
                 setStat(player.getUniqueId().toString(), stat);
             }
