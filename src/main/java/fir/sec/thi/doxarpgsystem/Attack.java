@@ -1,5 +1,6 @@
 package fir.sec.thi.doxarpgsystem;
 
+import jdk.jfr.internal.MirrorEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -17,6 +18,7 @@ public class Attack {
     public Stat s = new Stat();
     public DamageCalculator DC = new DamageCalculator();
 
+    @EventHandler
     public void Attack(EntityDamageByEntityEvent event){
         if (event.getDamager() != null && event.getDamager() instanceof Projectile){
             Projectile p = (Projectile) event.getDamager();
@@ -58,6 +60,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void PlayerDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, Player defender, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -109,6 +112,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void EntityDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -147,6 +151,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void PlayerDamageByEntity(EntityDamageByEntityEvent event, Player defender){
         long[] stat;
         stat = s.getStat(defender.getUniqueId().toString());
