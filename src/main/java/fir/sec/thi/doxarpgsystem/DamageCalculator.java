@@ -7,7 +7,6 @@ import java.util.Random;
 
 public class DamageCalculator {
 
-    public  Random r = new Random();
     public Stat s = new Stat();
 
     public int CombatDamage(Player player, int DefaultDamage, long STR){
@@ -38,7 +37,8 @@ public class DamageCalculator {
         }
     }
 
-    public int Random(int min, int max){
+    public int Random(int min, int max) {
+        Random r = new Random();
         return r.nextInt(max-min+1)+min;
     }
 
