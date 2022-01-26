@@ -1,6 +1,5 @@
 package fir.sec.thi.doxarpgsystem;
 
-import jdk.jfr.internal.MirrorEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -18,9 +17,9 @@ public class Attack {
     public Stat s = new Stat();
     public DamageCalculator DC = new DamageCalculator();
 
-    @EventHandler
     public void Attack(EntityDamageByEntityEvent event){
-        if (event.getDamager() != null && event.getDamager() instanceof Projectile){
+        event.getDamager();
+        if (event.getDamager() instanceof Projectile){
             Projectile p = (Projectile) event.getDamager();
             if (p.getType() == EntityType.ARROW){
                 if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player){
@@ -46,21 +45,24 @@ public class Attack {
             }
         }
         else {
-            if (event.getDamager() !=null && event.getDamager() instanceof LivingEntity){
-                if (event.getDamager() != null && event.getDamager() instanceof Player && event.getEntity() instanceof Player){
+            event.getDamager();
+            if (event.getDamager() instanceof LivingEntity){
+                event.getDamager();
+                if (event.getDamager() instanceof Player && event.getEntity() instanceof Player){
                     PlayerDamageByPlayer(event,(Player)event.getDamager(),(Player) event.getEntity(),(int)event.getDamage(),"A");
                 }
-                if (event.getDamager() != null && event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)){
+                event.getDamager();
+                if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)){
                     EntityDamageByPlayer(event,(Player)event.getDamager(),(int)event.getDamage(),"A");
                 }
-                if (event.getDamager() != null && !(event.getDamager() instanceof Player) && event.getEntity() instanceof Player){
+                event.getDamager();
+                if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player){
                     PlayerDamageByEntity(event, (Player) event.getEntity());
                 }
             }
         }
     }
 
-    @EventHandler
     public void PlayerDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, Player defender, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -101,7 +103,6 @@ public class Attack {
         }
     }
 
-    @EventHandler
     public void RangeAttack(EntityShootBowEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             Player player = (Player) event.getEntity();
@@ -112,7 +113,6 @@ public class Attack {
         }
     }
 
-    @EventHandler
     public void EntityDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -151,7 +151,6 @@ public class Attack {
         }
     }
 
-    @EventHandler
     public void PlayerDamageByEntity(EntityDamageByEntityEvent event, Player defender){
         long[] stat;
         stat = s.getStat(defender.getUniqueId().toString());
