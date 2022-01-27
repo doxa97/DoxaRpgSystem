@@ -35,7 +35,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public void onEnable() {
         // Plugin startup logic
         getLogger().info("Doxa On!");
-        getServer().getPluginManager().registerEvents(this, this);
+        getServer().getPluginManager().registerEvents(A, this);
         Objects.requireNonNull(getCommand("스탯")).setExecutor(this);
     }
 

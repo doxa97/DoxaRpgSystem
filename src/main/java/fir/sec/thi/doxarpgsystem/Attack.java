@@ -5,16 +5,19 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 
 import java.util.Objects;
 
-public class Attack {
+public class Attack implements Listener {
 
     public Stat s = new Stat();
     public DamageCalculator DC = new DamageCalculator();
 
+    @EventHandler
     public void Attack(EntityDamageByEntityEvent event){
         event.getDamager();
         if (event.getDamager() instanceof Projectile){
@@ -61,6 +64,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void PlayerDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, Player defender, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -101,6 +105,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void RangeAttack(EntityShootBowEvent event) {
         if (event.getEntityType() == EntityType.PLAYER) {
             Player player = (Player) event.getEntity();
@@ -111,6 +116,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void EntityDamageByPlayer(EntityDamageByEntityEvent event, Player attacker, int DefaultDamage, String AttackType) {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
@@ -149,6 +155,7 @@ public class Attack {
         }
     }
 
+    @EventHandler
     public void PlayerDamageByEntity(EntityDamageByEntityEvent event, Player defender){
         long[] stat;
         stat = s.getStat(defender.getUniqueId().toString());
