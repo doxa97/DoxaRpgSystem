@@ -74,6 +74,8 @@ public class Attack implements Listener {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage + Astat[14];
+            double bow = Astat[12];
+            Damage = (long) (Damage*bow);
             Damage = Damage - Dstat[11];
             event.setDamage(Damage);
             if (Damage <= 0) {
@@ -124,7 +126,8 @@ public class Attack implements Listener {
             long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage + Astat[14];
-            Damage = (Damage*Astat[12]);
+            double bow = Astat[12];
+            Damage = (long) (Damage*bow);
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);

@@ -43,13 +43,36 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
+    @SuppressWarnings("deprecation")
+    public boolean consumeItem(Player player, int count, Material mat) {
+        Map<Integer, ? extends ItemStack> ammo = player.getInventory().all(mat);
+        int found = 0;
+        for (ItemStack stack : ammo.values())
+            found += stack.getAmount();
+        if (count > found)
+            return false;
+        for (Integer index : ammo.keySet()) {
+            ItemStack stack = ammo.get(index);
+            int removed = Math.min(count, stack.getAmount());
+            count -= removed;
+            if (stack.getAmount() == removed)
+                player.getInventory().setItem(index, null);
+            else
+                stack.setAmount(stack.getAmount() - removed);
+            if (count <= 0)
+                break;
+        }
+        player.updateInventory();
+        return true;
+    }
+
     @EventHandler
     public void loadPS(PlayerMoveEvent p) {
         Player player = p.getPlayer();
         long[] stat;
         stat = s.getStat(player.getUniqueId().toString());
         if (player.getEquipment().getItemInMainHand() == null || Objects.requireNonNull(player.getEquipment().getItemInMainHand()).getType() == Material.AIR ||
-                ! player.getEquipment().getItemInMainHand().hasItemMeta()){
+                ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
             stat[13] = 0;
             stat[14] = 0;
             stat[15] = 0;
@@ -326,7 +349,6 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             //noinspection rawtypes
             ArrayList lorelistw = (ArrayList) Objects.requireNonNull(w.getItemMeta()).getLore();
             for (Object string : Objects.requireNonNull(lorelistw)){
-                player.sendMessage(String.valueOf(lorelistw));
                 String s1 = (String) lorelistw.get(3);
                 String s2 = (String) lorelistw.get(4);
                 if (s1.contains("근접")) {
@@ -616,11 +638,12 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }
             }
         }
-        stat[18] = (long) (0.1 + stat[9] * 0.001) +stat[27]+stat[28]+stat[29]+stat[30];
+        stat[18] = 100 + stat[9] + stat[27] + stat[28] + stat[29] + stat[30];
         stat[17] = stat[5] + (stat[6] * 5) + stat[23] + stat[24] + stat[25] + stat [26];
         stat[11] = stat[19]+stat[20]+stat[21]+stat[22];
+        double speed = stat[18]*0.001;
         Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[17]);
-        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(stat[18]);
+        Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
         s.setStat(player.getUniqueId().toString(), stat);
 
     }
@@ -640,6 +663,8 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 if (args.length == 1) {
                     int money = 0;
                     Player p = (Player) talker;
+                    long[] stat;
+                    stat = s.getStat(p.getUniqueId().toString());
                     try {
                         money = Integer.parseInt(args[0]);
                     } catch (Exception e) {
@@ -648,18 +673,27 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     if (money < 0) {
                         talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "음수는 제공되지 않습니다 고객님 ^^7");
                     } else {
-                        ItemStack paper = new ItemStack(Material.PAPER);
-                        ItemMeta im = paper.getItemMeta();
-                        assert im != null;
-                        im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + args[0] + "골드");
-                        paper.setItemMeta(im);
-                        p.getInventory().addItem(paper);
+                        if (stat[4] > money) {
+                            ItemStack paper = new ItemStack(Material.PAPER);
+                            ItemMeta im = paper.getItemMeta();
+                            assert im != null;
+                            im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ] " + ChatColor.WHITE + args[0] + " 골드");
+                            paper.setItemMeta(im);
+                            p.getInventory().addItem(paper);
+                            stat[4] = stat[4] - money;
+                            s.setStat(p.getUniqueId().toString(), stat);
+                        }
+                        else {
+                            talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "돈이 부족합니다.");
+                        }
                     }
                 }
                 if (args.length == 2) {
                     int money = 0;
                     int num = 0;
                     Player p = (Player) talker;
+                    long[] stat;
+                    stat = s.getStat(p.getUniqueId().toString());
                     try {
                         money = Integer.parseInt(args[0]);
                         num = Integer.parseInt(args[1]);
@@ -669,13 +703,19 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     if (money < 0) {
                         talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "음수는 제공되지 않습니다 고객님 ^^7");
                     } else {
-                        ItemStack paper = new ItemStack(Material.PAPER);
-                        ItemMeta im = paper.getItemMeta();
-                        assert im != null;
-                        im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + args[0] + "골드");
-                        paper.setItemMeta(im);
-                        for (int i = 0; i < num; i++) {
-                            p.getInventory().addItem(paper);
+                        if (money < stat[4]){
+                            ItemStack paper = new ItemStack(Material.PAPER);
+                            ItemMeta im = paper.getItemMeta();
+                            assert im != null;
+                            im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ] " + ChatColor.WHITE + args[0] + " 골드");
+                            paper.setItemMeta(im);
+                            for (int i = 0; i < num; i++) {
+                                p.getInventory().addItem(paper);
+                            }
+                            stat[4] = stat[4] - ((long) money * num);
+                            s.setStat(p.getUniqueId().toString(), stat);
+                        }else {
+                            talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "돈이 부족합니다.");
                         }
                     }
                 }
@@ -967,7 +1007,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     p.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "마법서를 왼 손에 들어주세요.");
                 }
             }
-        }if(a == Action.RIGHT_CLICK_AIR){
+        }else if(a == Action.RIGHT_CLICK_AIR){
             if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.BLAZE_ROD){
                 ArrayList<String> List = new ArrayList<>(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
                 if (List.contains("미감정")){
@@ -988,6 +1028,21 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 }
             }
+            else if (p.getEquipment().getItemInMainHand().getType() == Material.PAPER){
+                ItemStack total = p.getEquipment().getItemInMainHand();
+                ItemMeta paper = total.getItemMeta();
+                if (Objects.requireNonNull(paper).getDisplayName().contains("골드")){
+                    paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace("[ Ercanel ] ", "")));
+                    paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace(" 골드", "")));
+                    int money = Integer.parseInt(paper.getDisplayName());
+                    consumeItem(p, 1, Material.PAPER);
+                    p.updateInventory();
+                    long[] stat;
+                    stat = s.getStat(p.getUniqueId().toString());
+                    stat[4] = stat[4] + money;
+                    s.setStat(p.getUniqueId().toString(), stat);
+                }
+            }
         }
     }
 
@@ -1001,7 +1056,12 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 
     @EventHandler
     public void FirstJoin(PlayerJoinEvent event){
-        s.CreateNewStat(event.getPlayer().getUniqueId().toString());
+        Player p = event.getPlayer();
+        long[] stat;
+        stat = s.getStat(p.getUniqueId().toString());
+        if (stat[0] == Long.parseLong(null)) {
+            s.CreateNewStat(event.getPlayer().getUniqueId().toString());
+        }
     }
 
 }
