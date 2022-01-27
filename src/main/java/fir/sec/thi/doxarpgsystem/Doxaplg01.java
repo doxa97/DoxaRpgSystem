@@ -613,20 +613,24 @@ class RPGItem {
         return "null";
     }
 
-    public String get_attack_value() {
+    public Double get_attack_value() {
         String attackType = get_attack_type();
-        String string = "null";
+        double doublevariable = 0.0;
         if (!Objects.equals(attackType, "null")) {
             List<String> lore = Objects.requireNonNull(itemStack.getItemMeta()).getLore();
             if (lore != null) {
                 for (String i: lore) {
                     if (i.startsWith(attackType)) {
-                        string = i.substring(attackType.length());
+                        try {
+                            doublevariable = Double.parseDouble(i.substring(attackType.length()));
+                        } catch (NullPointerException | NumberFormatException exception) {
+                            return 0.0;
+                        }
                     }
                 }
             }
         }
-        return string;
+        return doublevariable;
     }
 
     private Boolean listcontains(String string, List<String> stringList) {
