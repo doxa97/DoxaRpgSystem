@@ -10,9 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -28,7 +25,6 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     public Stat s = new Stat();
     public GUI SGui = new GUI();
     public Attack A = new Attack();
-    public Level L = new Level();
     public DamageCalculator DC = new DamageCalculator();
 
     @Override
@@ -36,6 +32,8 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin startup logic
         getLogger().info("Doxa On!");
         getServer().getPluginManager().registerEvents(A, this);
+        getServer().getPluginManager().registerEvents(new Level(), this);
+        getServer().getPluginManager().registerEvents(this, this);
         Objects.requireNonNull(getCommand("스탯")).setExecutor(this);
     }
 
@@ -557,23 +555,10 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     }
 
     @EventHandler
-    public void RangeAttack(EntityShootBowEvent event) {
-        A.RangeAttack(event);}
-
-    @EventHandler
-    public void EntityAttack(EntityDamageByEntityEvent event) {
-        A.Attack(event);
-    }
-
-    @EventHandler
     public void FirstJoin(PlayerJoinEvent event){
         s.CreateNewStat(event.getPlayer().getUniqueId().toString());
     }
 
-    @EventHandler
-    public void MK(EntityDeathEvent event) {
-        L.MonsterKill(event);
-    }
 }
 
 class RPGItem {

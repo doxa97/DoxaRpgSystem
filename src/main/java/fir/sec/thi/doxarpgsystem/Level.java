@@ -3,14 +3,17 @@ package fir.sec.thi.doxarpgsystem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import java.util.Objects;
 
-public class Level {
+public class Level implements Listener {
 
     public Stat s = new Stat();
 
+    @EventHandler
     public void MonsterKill(EntityDeathEvent event){
         if (Objects.equals(Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause().toString(), "ENTITY_ATTACK")){
             if (event.getEntity().getKiller() != null){
