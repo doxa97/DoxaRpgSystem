@@ -20,6 +20,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
+@SuppressWarnings("unused")
 public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExecutor {
 
     public Stat s = new Stat();
@@ -43,27 +44,25 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
-    @SuppressWarnings("deprecation")
-    public boolean consumeItem(Player player, int count, Material mat) {
+    public void consumeItem(Player player, int count, Material mat) {
         Map<Integer, ? extends ItemStack> ammo = player.getInventory().all(mat);
         int found = 0;
         for (ItemStack stack : ammo.values())
             found += stack.getAmount();
         if (count > found)
-            return false;
+            return;
         for (Integer index : ammo.keySet()) {
             ItemStack stack = ammo.get(index);
             int removed = Math.min(count, stack.getAmount());
             count -= removed;
             if (stack.getAmount() == removed)
-                player.getInventory().setItem(index, null);
+                player.getInventory().setItem(index, new ItemStack(Material.AIR));
             else
                 stack.setAmount(stack.getAmount() - removed);
             if (count <= 0)
                 break;
         }
         player.updateInventory();
-        return true;
     }
 
     @EventHandler
@@ -71,7 +70,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         Player player = p.getPlayer();
         long[] stat;
         stat = s.getStat(player.getUniqueId().toString());
-        if (player.getEquipment().getItemInMainHand() == null || Objects.requireNonNull(player.getEquipment().getItemInMainHand()).getType() == Material.AIR ||
+        if (Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getItemInMainHand()).getType() == Material.AIR ||
                 ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
             stat[13] = 0;
             stat[14] = 0;
@@ -104,11 +103,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -117,11 +116,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -135,11 +134,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -149,11 +148,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 } else {
                     ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList lorelistc = (ArrayList) Objects.requireNonNull(c.getItemMeta()).getLore();
+                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
                     for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = (String) lorelistc.get(3);
-                        String s2 = (String) lorelistc.get(4);
-                        String s3 = (String) lorelistc.get(5);
+                        String s1 = lorelistc.get(3);
+                        String s2 = lorelistc.get(4);
+                        String s3 = lorelistc.get(5);
                         stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                         stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
                         stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -167,11 +166,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         s.setStat(player.getUniqueId().toString(), stat);
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -185,11 +184,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -200,11 +199,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }
             } else {
                 ItemStack h = Objects.requireNonNull(player.getEquipment()).getHelmet();
-                ArrayList lorelisth = (ArrayList) Objects.requireNonNull(h.getItemMeta()).getLore();
+                ArrayList<String> lorelisth = (ArrayList<String>) Objects.requireNonNull(h.getItemMeta()).getLore();
                 for (Object string : Objects.requireNonNull(lorelisth)){
-                    String s1 = (String) lorelisth.get(3);
-                    String s2 = (String) lorelisth.get(4);
-                    String s3 = (String) lorelisth.get(5);
+                    String s1 = lorelisth.get(3);
+                    String s2 = lorelisth.get(4);
+                    String s3 = lorelisth.get(5);
                     stat[23] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                     stat[19] = Long.parseLong(s2.replace("방어력 : ", ""));
                     stat[27] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -230,11 +229,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -243,11 +242,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -261,11 +260,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -275,11 +274,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 } else {
                     ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList lorelistc = (ArrayList) Objects.requireNonNull(c.getItemMeta()).getLore();
+                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
                     for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = (String) lorelistc.get(3);
-                        String s2 = (String) lorelistc.get(4);
-                        String s3 = (String) lorelistc.get(5);
+                        String s1 = lorelistc.get(3);
+                        String s2 = lorelistc.get(4);
+                        String s3 = lorelistc.get(5);
                         stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                         stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
                         stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -299,11 +298,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -312,11 +311,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -330,11 +329,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -346,11 +345,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             }
         } else {
             ItemStack w = Objects.requireNonNull(player.getEquipment()).getItemInMainHand();
-            //noinspection rawtypes
-            ArrayList lorelistw = (ArrayList) Objects.requireNonNull(w.getItemMeta()).getLore();
+            ArrayList<String> lorelistw = (ArrayList<String>) Objects.requireNonNull(w.getItemMeta()).getLore();
             for (Object string : Objects.requireNonNull(lorelistw)){
-                String s1 = (String) lorelistw.get(3);
-                String s2 = (String) lorelistw.get(4);
+                player.sendMessage(String.valueOf(lorelistw));
+                String s1 = lorelistw.get(3);
+                String s2 = lorelistw.get(4);
                 if (s1.contains("근접")) {
                     stat[13] = Long.parseLong(s1.replace("근접 공격력 : ", ""));
                     if (s2.contains("치명타")){
@@ -397,11 +396,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -410,11 +409,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -428,11 +427,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -442,11 +441,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 } else {
                     ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList lorelistc = (ArrayList) Objects.requireNonNull(c.getItemMeta()).getLore();
+                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
                     for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = (String) lorelistc.get(3);
-                        String s2 = (String) lorelistc.get(4);
-                        String s3 = (String) lorelistc.get(5);
+                        String s1 = lorelistc.get(3);
+                        String s2 = lorelistc.get(4);
+                        String s3 = lorelistc.get(5);
                         stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                         stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
                         stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -460,11 +459,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         s.setStat(player.getUniqueId().toString(), stat);
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -478,11 +477,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -493,11 +492,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 }
             } else {
                 ItemStack h = Objects.requireNonNull(player.getEquipment()).getHelmet();
-                ArrayList lorelisth = (ArrayList) Objects.requireNonNull(h.getItemMeta()).getLore();
+                ArrayList<String> lorelisth = (ArrayList<String>) Objects.requireNonNull(h.getItemMeta()).getLore();
                 for (Object string : Objects.requireNonNull(lorelisth)){
-                    String s1 = (String) lorelisth.get(3);
-                    String s2 = (String) lorelisth.get(4);
-                    String s3 = (String) lorelisth.get(5);
+                    String s1 = lorelisth.get(3);
+                    String s2 = lorelisth.get(4);
+                    String s3 = lorelisth.get(5);
                     stat[23] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                     stat[19] = Long.parseLong(s2.replace("방어력 : ", ""));
                     stat[27] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -523,11 +522,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -536,11 +535,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -554,11 +553,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -568,11 +567,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 } else {
                     ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList lorelistc = (ArrayList) Objects.requireNonNull(c.getItemMeta()).getLore();
+                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
                     for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = (String) lorelistc.get(3);
-                        String s2 = (String) lorelistc.get(4);
-                        String s3 = (String) lorelistc.get(5);
+                        String s1 = lorelistc.get(3);
+                        String s2 = lorelistc.get(4);
+                        String s3 = lorelistc.get(5);
                         stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                         stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
                         stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -592,11 +591,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -605,11 +604,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                     } else {
                         ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList lorelistl = (ArrayList) Objects.requireNonNull(l.getItemMeta()).getLore();
+                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
                         for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = (String) lorelistl.get(3);
-                            String s2 = (String) lorelistl.get(4);
-                            String s3 = (String) lorelistl.get(5);
+                            String s1 = lorelistl.get(3);
+                            String s2 = lorelistl.get(4);
+                            String s3 = lorelistl.get(5);
                             stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                             stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
                             stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -623,11 +622,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             s.setStat(player.getUniqueId().toString(), stat);
                         } else {
                             ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList lorelistb = (ArrayList) Objects.requireNonNull(b.getItemMeta()).getLore();
+                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
                             for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = (String) lorelistb.get(3);
-                                String s2 = (String) lorelistb.get(4);
-                                String s3 = (String) lorelistb.get(5);
+                                String s1 = lorelistb.get(3);
+                                String s2 = lorelistb.get(4);
+                                String s3 = lorelistb.get(5);
                                 stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
                                 stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
                                 stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
@@ -1007,7 +1006,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     p.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "마법서를 왼 손에 들어주세요.");
                 }
             }
-        }else if(a == Action.RIGHT_CLICK_AIR){
+        } else if(a == Action.RIGHT_CLICK_AIR){
             if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.BLAZE_ROD){
                 ArrayList<String> List = new ArrayList<>(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
                 if (List.contains("미감정")){
