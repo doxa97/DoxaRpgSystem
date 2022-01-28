@@ -44,27 +44,25 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
-    @SuppressWarnings("deprecation")
-    public boolean consumeItem(Player player, int count, Material mat) {
+    public void consumeItem(Player player, int count, Material mat) {
         Map<Integer, ? extends ItemStack> ammo = player.getInventory().all(mat);
         int found = 0;
         for (ItemStack stack : ammo.values())
             found += stack.getAmount();
         if (count > found)
-            return false;
+            return;
         for (Integer index : ammo.keySet()) {
             ItemStack stack = ammo.get(index);
             int removed = Math.min(count, stack.getAmount());
             count -= removed;
             if (stack.getAmount() == removed)
-                player.getInventory().setItem(index, null);
+                player.getInventory().setItem(index, new ItemStack(Material.AIR));
             else
                 stack.setAmount(stack.getAmount() - removed);
             if (count <= 0)
                 break;
         }
         player.updateInventory();
-        return true;
     }
 
     @EventHandler
@@ -72,7 +70,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         Player player = p.getPlayer();
         long[] stat;
         stat = s.getStat(player.getUniqueId().toString());
-        if (player.getEquipment().getItemInMainHand() == null || Objects.requireNonNull(player.getEquipment().getItemInMainHand()).getType() == Material.AIR ||
+        if (Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getItemInMainHand()).getType() == Material.AIR ||
                 ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
             stat[13] = 0;
             stat[14] = 0;
@@ -1008,7 +1006,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     p.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "마법서를 왼 손에 들어주세요.");
                 }
             }
-        }else if(a == Action.RIGHT_CLICK_AIR){
+        } else if(a == Action.RIGHT_CLICK_AIR){
             if (Objects.requireNonNull(p.getEquipment()).getItemInMainHand().getType() == Material.BLAZE_ROD){
                 ArrayList<String> List = new ArrayList<>(Objects.requireNonNull(Objects.requireNonNull(p.getEquipment().getItemInMainHand().getItemMeta()).getLore()));
                 if (List.contains("미감정")){

@@ -19,8 +19,8 @@ public class Level implements Listener {
             if (event.getEntity().getKiller() != null){
                 if (Objects.requireNonNull(Bukkit.getServer().getPlayer((event.getEntity().getKiller().getName()))).isOnline()){
                     Player player = event.getEntity().getKiller();
-                    if (event.getEntityType() == EntityType.SILVERFISH){
-                        if (event.getEntity().getName().contains("LV.1")) {
+                    if (event.getEntityType() == EntityType.SILVERFISH) {
+                        if (event.getEntity().getName().contains("LV.1")){
                             event.setDroppedExp(0);
                             long[] stat;
                             stat = s.getStat(player.getUniqueId().toString());
