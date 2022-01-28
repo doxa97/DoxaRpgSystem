@@ -9,13 +9,13 @@ public class DamageCalculator {
 
     public Stat s = new Stat();
 
-    public int CombatDamage(Player player, int DefaultDamage, long STR){
+    public int CombatDamage(int DefaultDamage, long STR){
         return (int) (STR*1.5) + DefaultDamage;
     }
-    public int CombatRangeDamage(Player player, int DefaultDamage, long DEX){
+    public int CombatRangeDamage(int DefaultDamage, long DEX){
         return (int) (DEX*2) + DefaultDamage;
     }
-    public int CombatMagicDamage(Player player, int DefaultDamage, long INT){
+    public int CombatMagicDamage(int DefaultDamage, long INT){
         return (int) (INT*1.3) + DefaultDamage;
     }
 

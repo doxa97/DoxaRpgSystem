@@ -8,6 +8,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 
 import java.util.Objects;
@@ -18,47 +19,42 @@ public class Attack implements Listener {
     public DamageCalculator DC = new DamageCalculator();
 
     @EventHandler
-    public void Attack(EntityDamageByEntityEvent event){
-        event.getDamager();
+    public void AttackEvent(EntityDamageByEntityEvent event){
         if (event.getDamager() instanceof Projectile){
             Projectile p = (Projectile) event.getDamager();
             if (p.getType() == EntityType.ARROW){
                 if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player){
                     PlayerDamageByPlayer(event,(Player)p.getShooter(),(Player) event.getEntity(),(int)event.getDamage(),"B");
                 }
-                if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
+                else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
                     EntityDamageByPlayer(event,(Player) p.getShooter(),(int)event.getDamage(),"B");
                 }
-                if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
-                    PlayerDamageByEntity(event,(Player)event.getEntity());
-                }
-            }
-            else if (p.getType() == EntityType.SPLASH_POTION){
-                if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player){
-                    PlayerDamageByPlayer(event,(Player)p.getShooter(),(Player) event.getEntity(),(int)event.getDamage(),"M");
-                }
-                if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
-                    EntityDamageByPlayer(event,(Player) p.getShooter(),(int)event.getDamage(),"M");
-                }
-                if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
+                else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
                     PlayerDamageByEntity(event,(Player)event.getEntity());
                 }
             }
         }
         else {
-            event.getDamager();
             if (event.getDamager() instanceof LivingEntity){
-                event.getDamager();
-                if (event.getDamager() instanceof Player && event.getEntity() instanceof Player){
-                    PlayerDamageByPlayer(event,(Player)event.getDamager(),(Player) event.getEntity(),(int)event.getDamage(),"A");
+                if (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause() == EntityDamageEvent.DamageCause.MAGIC){
+                    if (event.getDamager() instanceof Player && event.getEntity() instanceof Player){
+                        PlayerDamageByPlayer(event,(Player)event.getDamager(),(Player) event.getEntity(),(int)event.getDamage(),"M");
+                    }
+                    else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)){
+                        EntityDamageByPlayer(event,(Player)event.getDamager(),(int)event.getDamage(),"M");
+                    }
+                    else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                        PlayerDamageByEntity(event, (Player) event.getEntity());
+                    }
                 }
-                event.getDamager();
-                if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)){
-                    EntityDamageByPlayer(event,(Player)event.getDamager(),(int)event.getDamage(),"A");
-                }
-                event.getDamager();
-                if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player){
-                    PlayerDamageByEntity(event, (Player) event.getEntity());
+                else {
+                    if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                        PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
+                    } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                        EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
+                    } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                        PlayerDamageByEntity(event, (Player) event.getEntity());
+                    }
                 }
             }
         }
@@ -71,10 +67,10 @@ public class Attack implements Listener {
         long[] Dstat;
         Dstat = s.getStat(defender.getUniqueId().toString());
         if (Objects.equals(AttackType, "B")) {
-            long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
+            long Damage = DC.CombatRangeDamage(DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage + Astat[14];
-            double bow = Astat[12];
+            double bow = Astat[12]*0.01;
             Damage = (long) (Damage*bow);
             Damage = Damage - Dstat[11];
             event.setDamage(Damage);
@@ -84,7 +80,7 @@ public class Attack implements Listener {
         }
         else {
             if (Objects.equals(AttackType, "A")) {
-                long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
+                long Damage = DC.CombatDamage(DefaultDamage, Astat[7]);
                 Damage = DC.Critical(attacker, Astat[9], (int) Damage);
                 Damage = Damage + Astat[13];
                 Damage = Damage - Dstat[11];
@@ -95,7 +91,7 @@ public class Attack implements Listener {
             }
             else {
                 if (Objects.equals(AttackType, "M")) {
-                    long Damage = DC.CombatMagicDamage(attacker, DefaultDamage, Astat[10]);
+                    long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
                     Damage = DC.Critical(attacker, Astat[9], (int) Damage);
                     Damage = Damage + Astat[13];
                     event.setDamage(Damage);
@@ -123,10 +119,10 @@ public class Attack implements Listener {
         long[] Astat;
         Astat = s.getStat(attacker.getUniqueId().toString());
         if (Objects.equals(AttackType, "B")) {
-            long Damage = DC.CombatRangeDamage(attacker, DefaultDamage, Astat[8]);
+            long Damage = DC.CombatRangeDamage(DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage + Astat[14];
-            double bow = Astat[12];
+            double bow = Astat[12]*0.01;
             Damage = (long) (Damage*bow);
             event.setDamage(Damage);
             if (Damage <= 0) {
@@ -137,7 +133,7 @@ public class Attack implements Listener {
             }
 
         } else if (Objects.equals(AttackType, "A")) {
-            long Damage = DC.CombatDamage(attacker, DefaultDamage, Astat[7]);
+            long Damage = DC.CombatDamage(DefaultDamage, Astat[7]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
             Damage = Damage + Astat[13];
             event.setDamage(Damage);
@@ -147,7 +143,7 @@ public class Attack implements Listener {
         }
         else {
             if (Objects.equals(AttackType, "M")) {
-                long Damage = DC.CombatMagicDamage(attacker, DefaultDamage, Astat[10]);
+                long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
                 Damage = DC.Critical(attacker, Astat[9], (int) Damage);
                 Damage = Damage + Astat[13];
                 event.setDamage(Damage);
