@@ -44,25 +44,31 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         // Plugin shutdown logic
     }
 
-    public void consumeItem(Player player, int count, Material mat) {
-        Map<Integer, ? extends ItemStack> ammo = player.getInventory().all(mat);
-        int found = 0;
-        for (ItemStack stack : ammo.values())
-            found += stack.getAmount();
-        if (count > found)
-            return;
-        for (Integer index : ammo.keySet()) {
-            ItemStack stack = ammo.get(index);
-            int removed = Math.min(count, stack.getAmount());
-            count -= removed;
-            if (stack.getAmount() == removed)
-                player.getInventory().setItem(index, new ItemStack(Material.AIR));
-            else
-                stack.setAmount(stack.getAmount() - removed);
-            if (count <= 0)
-                break;
+    private void ConsumeGoldPaper(Player player) {
+        ItemStack itemStack = player.getInventory().getItemInMainHand();
+        ItemMeta paper = itemStack.getItemMeta();
+        try {
+            String papername = Objects.requireNonNull(paper).getDisplayName();
         }
+        catch (NullPointerException e) {
+            return;
+        }
+        String papername = Objects.requireNonNull(paper).getDisplayName()
+                .replace("[ Ercanel ] ", "")
+                .replace(" 골드", "");
+        try {
+            int money = Integer.parseInt(paper.getDisplayName());
+        }
+        catch(NumberFormatException error) {
+            return;
+        }
+        int money = Integer.parseInt(paper.getDisplayName());
+        itemStack.setAmount(itemStack.getAmount() - 1);
         player.updateInventory();
+        long[] stat;
+        stat = s.getStat(player.getUniqueId().toString());
+        stat[4] = stat[4] + money;
+        s.setStat(player.getUniqueId().toString(), stat);
     }
 
     @EventHandler
@@ -1031,15 +1037,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 ItemStack total = p.getEquipment().getItemInMainHand();
                 ItemMeta paper = total.getItemMeta();
                 if (Objects.requireNonNull(paper).getDisplayName().contains("골드")){
-                    paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace("[ Ercanel ] ", "")));
-                    paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace(" 골드", "")));
-                    int money = Integer.parseInt(paper.getDisplayName());
-                    consumeItem(p, 1, Material.PAPER);
-                    p.updateInventory();
-                    long[] stat;
-                    stat = s.getStat(p.getUniqueId().toString());
-                    stat[4] = stat[4] + money;
-                    s.setStat(p.getUniqueId().toString(), stat);
+                    ConsumeGoldPaper(p);
                 }
             }
         }
@@ -1072,22 +1070,6 @@ class RPGItem {
         this.itemStack = itemStack;
     }
 
-    /*
-                    String s1 = String.valueOf(Objects.requireNonNull(w.getItemMeta().getLore()).contains("공격력"));
-                String s2 = String.valueOf(w.getItemMeta().getLore().contains("치명타 확률"));
-                if (s1.contains("근접")) {
-                    stat[13] = Long.parseLong(s1.replace("근접 공격력 : ", ""));
-                }
-                if (s1.contains("원거리")) {
-                    stat[14] = Long.parseLong(s1.replace("원거리 공격력 : ", ""));
-                }
-                if (s1.contains("마법")) {
-                    stat[15] = Long.parseLong(s1.replace("마법 공격력 : ", ""));
-                }
-                if (s2.contains("치명타")){
-                    stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
-                }
-     */
     public String get_attack_type() {
         List<String> lore = Objects.requireNonNull(itemStack.getItemMeta()).getLore();
         if (lore != null) {
