@@ -19,41 +19,42 @@ public class Attack implements Listener {
     public DamageCalculator DC = new DamageCalculator();
 
     @EventHandler
-    public void AttackEvent(EntityDamageByEntityEvent event){
-        if (event.getDamager() instanceof Projectile){
-            Projectile p = (Projectile) event.getDamager();
-            if (p.getType() == EntityType.ARROW){
-                if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player){
-                    PlayerDamageByPlayer(event,(Player)p.getShooter(),(Player) event.getEntity(),(int)event.getDamage(),"B");
-                }
-                else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)){
-                    EntityDamageByPlayer(event,(Player) p.getShooter(),(int)event.getDamage(),"B");
-                }
-                else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player){
-                    PlayerDamageByEntity(event,(Player)event.getEntity());
-                }
-            }
-        }
-        else {
-            if (event.getDamager() instanceof LivingEntity){
-                if (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause() == EntityDamageEvent.DamageCause.MAGIC){
-                    if (event.getDamager() instanceof Player && event.getEntity() instanceof Player){
-                        PlayerDamageByPlayer(event,(Player)event.getDamager(),(Player) event.getEntity(),(int)event.getDamage(),"M");
-                    }
-                    else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)){
-                        EntityDamageByPlayer(event,(Player)event.getDamager(),(int)event.getDamage(),"M");
-                    }
-                    else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+    public void AttackEvent(EntityDamageByEntityEvent event) {
+        Player player = (Player) event.getDamager();
+        double ac = player.getAttackCooldown();
+        if (ac < 1.0) {
+            event.setCancelled(true);
+            player.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ChatColor.WHITE+"성급!");
+        } else {
+            if (event.getDamager() instanceof Projectile) {
+                Projectile p = (Projectile) event.getDamager();
+                if (p.getType() == EntityType.ARROW) {
+                    if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player) {
+                        PlayerDamageByPlayer(event, (Player) p.getShooter(), (Player) event.getEntity(), (int) event.getDamage(), "B");
+                    } else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)) {
+                        EntityDamageByPlayer(event, (Player) p.getShooter(), (int) event.getDamage(), "B");
+                    } else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player) {
                         PlayerDamageByEntity(event, (Player) event.getEntity());
                     }
                 }
-                else {
-                    if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-                        PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
-                    } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
-                        EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
-                    } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
-                        PlayerDamageByEntity(event, (Player) event.getEntity());
+            } else {
+                if (event.getDamager() instanceof LivingEntity) {
+                    if (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause().equals(EntityDamageEvent.DamageCause.MAGIC)) {
+                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "M");
+                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "M");
+                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                            PlayerDamageByEntity(event, (Player) event.getEntity());
+                        }
+                    } else if (event.getEntity().getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)){
+                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
+                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
+                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                            PlayerDamageByEntity(event, (Player) event.getEntity());
+                        }
                     }
                 }
             }

@@ -643,6 +643,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         double speed = stat[18]*0.001;
         Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[17]);
         Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
+        int exp = (int) stat[2];
+        int maxexp = (int) stat[3];
+        double perexp = (double) stat[2] / stat[3];
+        player.setExp(Float.parseFloat(String.format("%.1f", perexp)));
+        player.setLevel((int) stat[0]);
         s.setStat(player.getUniqueId().toString(), stat);
 
     }
@@ -1034,12 +1039,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace("[ Ercanel ] ", "")));
                     paper.setDisplayName(ChatColor.stripColor(paper.getDisplayName().replace(" 골드", "")));
                     int money = Integer.parseInt(paper.getDisplayName());
-                    consumeItem(p, 1, Material.PAPER);
-                    p.updateInventory();
                     long[] stat;
                     stat = s.getStat(p.getUniqueId().toString());
                     stat[4] = stat[4] + money;
                     s.setStat(p.getUniqueId().toString(), stat);
+                    consumeItem(p, 1, Material.PAPER);
                 }
             }
         }
@@ -1056,9 +1060,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     @EventHandler
     public void FirstJoin(PlayerJoinEvent event){
         Player p = event.getPlayer();
-        long[] stat;
-        stat = s.getStat(p.getUniqueId().toString());
-        if (stat[0] == Long.parseLong(null)) {
+        if (p.getLevel() == 0) {
             s.CreateNewStat(event.getPlayer().getUniqueId().toString());
         }
     }
