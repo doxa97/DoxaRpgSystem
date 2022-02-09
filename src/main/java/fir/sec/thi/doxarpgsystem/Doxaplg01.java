@@ -1053,10 +1053,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 
     @EventHandler
     public void FirstJoin(PlayerJoinEvent event){
-        Player p = event.getPlayer();
-        long[] stat;
-        stat = s.getStat(p.getUniqueId().toString());
-        if (stat[0] == Long.parseLong(null)) {
+        if (event.getPlayer().getLevel() == 0) {
             s.CreateNewStat(event.getPlayer().getUniqueId().toString());
         }
     }
