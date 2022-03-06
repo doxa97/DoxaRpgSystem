@@ -48,11 +48,11 @@ public class Stat {
             List list = new ArrayList();
             String s;
             while ((s = R.readLine()) != null) {
-                list.add(Long.valueOf(Cutter(s)));
+                list.add(Cutter(s));
             }
             R.close();
             for (int count = 0; count < 31; count++) {
-                stat[count] = ((Long) list.get(count)).longValue();
+                stat[count] = (Long) list.get(count);
             }
             return stat;
         } catch (IOException localIoException) {

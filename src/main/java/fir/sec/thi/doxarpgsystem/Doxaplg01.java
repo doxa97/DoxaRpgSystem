@@ -52,7 +52,10 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 for (Player player :Bukkit.getOnlinePlayers()) {
 
                     if (Objects.requireNonNull(player.getEquipment()).getItemInMainHand().getType() == Material.AIR || ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
-                        attack.clear();
+                        attack.put("근접 공격력", 0);
+                        attack.put("원거리 공격력", 0);
+                        attack.put("마법 공격력", 0);
+                        critical.put("치명타 확률", 0);
                     } else {
 
                         ArrayList<String> loremainhand = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player).getEquipment()).getItemInMainHand().getItemMeta()).getLore());
@@ -64,22 +67,23 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 
                         if (ia.contains("근접")) {
                             attack.put("근접 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("근접 공격력 : ", ""))));
-                            attack.remove("원거리 공격력");
-                            attack.remove("마법 공격력");
+                            attack.put("원거리 공격력", 0);
+                            attack.put("마법 공격력", 0);
                         }
                         if (ia.contains("원거리")) {
                             attack.put("원거리 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("원거리 공격력 : ", ""))));
-                            attack.remove("근접 공격력");
-                            attack.remove("마법 공격력");
+                            attack.put("마법 공격력", 0);
+                            attack.put("근접 공격력", 0);
                         }
                         if (ia.contains("마법")) {
                             attack.put("원거리 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("마법 공격력 : ", ""))));
-                            attack.remove("원거리 공격력");
-                            attack.remove("근접 공격력");
+                            attack.put("마법 공격력", 0);
+                            attack.put("근접 공격력", 0);
                         }
                         critical.put("치명타 확률", Integer.valueOf(ChatColor.stripColor(ia.replace("치명타 확률 : ", ""))));
                     }
-                    if (Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR || ! player.getEquipment().getHelmet().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getHelmet().getItemMeta()).hasLore()){
+                    if (player.getEquipment().getHelmet() == null || Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR ||
+                            ! player.getEquipment().getHelmet().hasItemMeta()){
                         defense.put("투구", 0);
                         health.put("투구", 0);
                         regen.put("투구", 0);
@@ -89,6 +93,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         ArrayList<String> lorehelmet = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getHelmet()).getItemMeta()).getLore());
 
                         int hindexdefense = Objects.requireNonNull(lorehelmet).indexOf("방어력");
+                        player.sendMessage(String.valueOf(hindexdefense));
                         String hid = lorehelmet.get(hindexdefense);
                         int hindexhealth = Objects.requireNonNull(lorehelmet).indexOf("체력 증가");
                         String hih = lorehelmet.get(hindexhealth);
@@ -102,7 +107,8 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         regen.put("투구", Integer.valueOf(ChatColor.stripColor(hir.replace("체력 재생 : ", ""))));
                         movespeed.put("투구", Integer.valueOf(ChatColor.stripColor(him.replace("이동 속도", ""))));
                     }
-                    if (Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR || ! player.getEquipment().getChestplate().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getChestplate().getItemMeta()).hasLore()){
+                    if (player.getEquipment().getChestplate() == null || player.getEquipment().getChestplate().getType() == Material.AIR ||
+                            ! player.getEquipment().getChestplate().hasItemMeta()){
                         defense.put("흉갑", 0);
                         health.put("흉갑", 0);
                         regen.put("흉갑", 0);
@@ -125,7 +131,8 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         regen.put("흉갑", Integer.valueOf(ChatColor.stripColor(cir.replace("체력 재생 : ", ""))));
                         movespeed.put("흉갑", Integer.valueOf(ChatColor.stripColor(cim.replace("이동 속도", ""))));
                     }
-                    if (Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR || ! player.getEquipment().getLeggings().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getLeggings().getItemMeta()).hasLore()){
+                    if (player.getEquipment().getLeggings() == null || player.getEquipment().getLeggings().getType() == Material.AIR ||
+                            ! player.getEquipment().getLeggings().hasItemMeta()){
                         defense.put("각반", 0);
                         health.put("각반", 0);
                         regen.put("각반", 0);
@@ -148,7 +155,8 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         regen.put("각반", Integer.valueOf(ChatColor.stripColor(lir.replace("체력 재생 : ", ""))));
                         movespeed.put("각반", Integer.valueOf(ChatColor.stripColor(lim.replace("이동 속도", ""))));
                     }
-                    if (Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR || ! player.getEquipment().getBoots().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getBoots().getItemMeta()).hasLore()){
+                    if (player.getEquipment().getBoots() == null || player.getEquipment().getBoots().getType() == Material.AIR ||
+                            ! player.getEquipment().getBoots().hasItemMeta()){
                         defense.put("신발", 0);
                         health.put("신발", 0);
                         regen.put("신발", 0);
@@ -180,7 +188,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     stat[13] = attack.get("근접 공격력");
                     stat[14] = attack.get("원거리 공격력");
                     stat[15] = attack.get("마법 공격력");
-                    stat[31] = attack.get("치명타 확률");
+                    stat[31] = critical.get("치명타 확률");
 
                     stat[18] = 100 + movespeed.get("투구") + movespeed.get("흉갑") + movespeed.get("각반") + movespeed.get("신발");                     // 이동 속도
                     stat[17] = stat[5] + (stat[6] * 5) + health.get("투구") + health.get("흉갑") + health.get("각반") + health.get("신발");             // 체력
@@ -770,10 +778,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()){
-                    long[] stat;
-                    stat = s.getStat(player.getUniqueId().toString());
-                    double regeneration = regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발") + stat[6]*2;
-                    player.setHealth(player.getHealth() + regeneration);
+                    if (player.getMaxHealth() > player.getHealth()) {
+                        double regeneration = (regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발"));
+                        player.setHealth(Math.round(player.getHealth()) + regeneration + 1);
+                    }
+
                 }
             }
         },0L, 100L);

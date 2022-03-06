@@ -54,7 +54,7 @@ public class GUI {
         Inventory status = Bukkit.createInventory(null, 9 ,"[ Status ]");
         Stack(ChatColor.RED+"[ 체력 ]", Material.APPLE,0,1, Arrays.asList(ChatColor.GRAY+"현재 체력 스탯 : " + i[6],
                 ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
-                ChatColor.GRAY+"추가 체력 : " + i[6]*5, ChatColor.GRAY+"추가 재생력 : " + i[6]*2),0,status);
+                ChatColor.GRAY+"추가 체력 : " + i[6]*5),0,status);
         Stack(ChatColor.DARK_RED+"[ 힘 ]", Material.IRON_SWORD,0,1, Arrays.asList(ChatColor.GRAY+"현재 힘 스탯 : " + i[7],
                 ChatColor.GRAY+"현재 여유 스탯 : " + i[1],
                 ChatColor.GRAY+"추가 근접 물리 공격력 : " + i[7]*1.5),2,status);
