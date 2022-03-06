@@ -1,16 +1,13 @@
 package fir.sec.thi.doxarpgsystem;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Attack implements Listener {
@@ -20,11 +17,16 @@ public class Attack implements Listener {
 
     @EventHandler
     public void AttackEvent(EntityDamageByEntityEvent event) {
-        Player player = (Player) event.getDamager();
-        double ac = player.getAttackCooldown();
-        if (ac < 1.0) {
-            event.setCancelled(true);
-            player.sendMessage(ChatColor.DARK_AQUA+"[ Ercanel ]"+ChatColor.WHITE+"성급!");
+        LivingEntity dentity = (LivingEntity) event.getEntity();
+        dentity.setMaximumNoDamageTicks(0);
+        dentity.setNoDamageTicks(0);
+        if (event.getDamager().getType() == EntityType.PLAYER){
+            Player player = (Player) event.getDamager();
+            double ac = player.getAttackCooldown();
+            if (ac < 1.0) {
+                event.setCancelled(true);
+               player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "성급!");
+            }
         } else {
             if (event.getDamager() instanceof Projectile) {
                 Projectile p = (Projectile) event.getDamager();
@@ -39,22 +41,23 @@ public class Attack implements Listener {
                 }
             } else {
                 if (event.getDamager() instanceof LivingEntity) {
-                    if (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause().equals(EntityDamageEvent.DamageCause.MAGIC)) {
-                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "M");
-                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
-                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "M");
-                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
-                            PlayerDamageByEntity(event, (Player) event.getEntity());
-                        }
-                    } else if (event.getEntity().getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK)){
-                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
-                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
-                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
-                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
-                            PlayerDamageByEntity(event, (Player) event.getEntity());
-                        }
+                    switch (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause()){
+                        case MAGIC:
+                            if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                                PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "M");
+                            } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                                EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "M");
+                            } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                                PlayerDamageByEntity(event, (Player) event.getEntity());
+                            }
+                        case ENTITY_ATTACK:
+                            if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                                PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
+                            } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                                EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
+                            } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                                PlayerDamageByEntity(event, (Player) event.getEntity());
+                            }
                     }
                 }
             }
