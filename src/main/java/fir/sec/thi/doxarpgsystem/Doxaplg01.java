@@ -50,57 +50,18 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             @Override
             public void run() {
                 for (Player player :Bukkit.getOnlinePlayers()) {
-                    ArrayList<String> loremainhand = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player).getEquipment()).getItemInMainHand().getItemMeta()).getLore());
-                    ArrayList<String> loreoffhand = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getItemInOffHand().getItemMeta()).getLore());
-                    ArrayList<String> lorehelmet = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getHelmet()).getItemMeta()).getLore());
-                    ArrayList<String> lorechestplate = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getChestplate()).getItemMeta()).getLore());
-                    ArrayList<String> loreleggings = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getLeggings()).getItemMeta()).getLore());
-                    ArrayList<String> loreboots = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getBoots()).getItemMeta()).getLore());
 
-                    int indexattack = Objects.requireNonNull(loremainhand).indexOf("공격력");
-                    String ia = loremainhand.get(indexattack);
-                    int indexcritical = Objects.requireNonNull(loremainhand).indexOf("치명타 확률");
-                    String ic = loremainhand.get(indexcritical);
-
-                    int hindexdefense = Objects.requireNonNull(lorehelmet).indexOf("방어력");
-                    String hid = lorehelmet.get(hindexdefense);
-                    int hindexhealth = Objects.requireNonNull(lorehelmet).indexOf("체력 증가");
-                    String hih = lorehelmet.get(hindexhealth);
-                    int hindexregen = Objects.requireNonNull(lorehelmet).indexOf("체력 재생");
-                    String hir = lorehelmet.get(hindexregen);
-                    int hindexmovespeed = Objects.requireNonNull(lorehelmet).indexOf("이동 속도");
-                    String him = lorehelmet.get(hindexmovespeed);
-
-                    int cindexdefense = Objects.requireNonNull(lorechestplate).indexOf("방어력");
-                    String cid = lorehelmet.get(cindexdefense);
-                    int cindexhealth = Objects.requireNonNull(lorechestplate).indexOf("체력 증가");
-                    String cih = lorehelmet.get(cindexhealth);
-                    int cindexregen = Objects.requireNonNull(lorechestplate).indexOf("체력 재생");
-                    String cir = lorehelmet.get(cindexregen);
-                    int cindexmovespeed = Objects.requireNonNull(lorechestplate).indexOf("이동 속도");
-                    String cim = lorehelmet.get(cindexmovespeed);
-
-                    int lindexdefense = Objects.requireNonNull(loreleggings).indexOf("방어력");
-                    String lid = lorehelmet.get(lindexdefense);
-                    int lindexhealth = Objects.requireNonNull(loreleggings).indexOf("체력 증가");
-                    String lih = lorehelmet.get(lindexhealth);
-                    int lindexregen = Objects.requireNonNull(loreleggings).indexOf("체력 재생");
-                    String lir = lorehelmet.get(lindexregen);
-                    int lindexmovespeed = Objects.requireNonNull(loreleggings).indexOf("이동 속도");
-                    String lim = lorehelmet.get(lindexmovespeed);
-
-                    int bindexdefense = Objects.requireNonNull(loreboots).indexOf("방어력");
-                    String bid = lorehelmet.get(bindexdefense);
-                    int bindexhealth = Objects.requireNonNull(loreboots).indexOf("체력 증가");
-                    String bih = lorehelmet.get(bindexhealth);
-                    int bindexregen = Objects.requireNonNull(loreboots).indexOf("체력 재생");
-                    String bir = lorehelmet.get(bindexregen);
-                    int bindexmovespeed = Objects.requireNonNull(loreboots).indexOf("이동 속도");
-                    String bim = lorehelmet.get(bindexmovespeed);
-
-                    if (player.getEquipment().getItemInMainHand().getType() == Material.AIR || ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! player.getEquipment().getItemInMainHand().getItemMeta().hasLore()){
+                    if (Objects.requireNonNull(player.getEquipment()).getItemInMainHand().getType() == Material.AIR || ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
                         attack.clear();
                     } else {
+
+                        ArrayList<String> loremainhand = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player).getEquipment()).getItemInMainHand().getItemMeta()).getLore());
+
+                        int indexattack = Objects.requireNonNull(loremainhand).indexOf("공격력");
+                        String ia = loremainhand.get(indexattack);
+                        int indexcritical = Objects.requireNonNull(loremainhand).indexOf("치명타 확률");
+                        String ic = loremainhand.get(indexcritical);
+
                         if (ia.contains("근접")) {
                             attack.put("근접 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("근접 공격력 : ", ""))));
                             attack.remove("원거리 공격력");
@@ -118,45 +79,93 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         }
                         critical.put("치명타 확률", Integer.valueOf(ChatColor.stripColor(ia.replace("치명타 확률 : ", ""))));
                     }
-                    if (player.getEquipment().getHelmet().getType() == Material.AIR || ! player.getEquipment().getHelmet().hasItemMeta() || ! player.getEquipment().getHelmet().getItemMeta().hasLore()){
+                    if (Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR || ! player.getEquipment().getHelmet().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getHelmet().getItemMeta()).hasLore()){
                         defense.put("투구", 0);
                         health.put("투구", 0);
                         regen.put("투구", 0);
                         movespeed.put("투구", 0);
                     } else {
+
+                        ArrayList<String> lorehelmet = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getHelmet()).getItemMeta()).getLore());
+
+                        int hindexdefense = Objects.requireNonNull(lorehelmet).indexOf("방어력");
+                        String hid = lorehelmet.get(hindexdefense);
+                        int hindexhealth = Objects.requireNonNull(lorehelmet).indexOf("체력 증가");
+                        String hih = lorehelmet.get(hindexhealth);
+                        int hindexregen = Objects.requireNonNull(lorehelmet).indexOf("체력 재생");
+                        String hir = lorehelmet.get(hindexregen);
+                        int hindexmovespeed = Objects.requireNonNull(lorehelmet).indexOf("이동 속도");
+                        String him = lorehelmet.get(hindexmovespeed);
+
                         defense.put("투구", Integer.valueOf(ChatColor.stripColor(hid.replace("방어력 : ", ""))));
                         health.put("투구", Integer.valueOf(ChatColor.stripColor(hih.replace("체력 증가 : ", ""))));
                         regen.put("투구", Integer.valueOf(ChatColor.stripColor(hir.replace("체력 재생 : ", ""))));
                         movespeed.put("투구", Integer.valueOf(ChatColor.stripColor(him.replace("이동 속도", ""))));
                     }
-                    if (player.getEquipment().getChestplate().getType() == Material.AIR || ! player.getEquipment().getChestplate().hasItemMeta() || ! player.getEquipment().getChestplate().getItemMeta().hasLore()){
+                    if (Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR || ! player.getEquipment().getChestplate().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getChestplate().getItemMeta()).hasLore()){
                         defense.put("흉갑", 0);
                         health.put("흉갑", 0);
                         regen.put("흉갑", 0);
                         movespeed.put("흉갑", 0);
                     } else {
+
+                        ArrayList<String> lorechestplate = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getChestplate()).getItemMeta()).getLore());
+
+                        int cindexdefense = Objects.requireNonNull(lorechestplate).indexOf("방어력");
+                        String cid = lorechestplate.get(cindexdefense);
+                        int cindexhealth = Objects.requireNonNull(lorechestplate).indexOf("체력 증가");
+                        String cih = lorechestplate.get(cindexhealth);
+                        int cindexregen = Objects.requireNonNull(lorechestplate).indexOf("체력 재생");
+                        String cir = lorechestplate.get(cindexregen);
+                        int cindexmovespeed = Objects.requireNonNull(lorechestplate).indexOf("이동 속도");
+                        String cim = lorechestplate.get(cindexmovespeed);
+
                         defense.put("흉갑", Integer.valueOf(ChatColor.stripColor(cid.replace("방어력 : ", ""))));
                         health.put("흉갑", Integer.valueOf(ChatColor.stripColor(cih.replace("체력 증가 : ", ""))));
                         regen.put("흉갑", Integer.valueOf(ChatColor.stripColor(cir.replace("체력 재생 : ", ""))));
                         movespeed.put("흉갑", Integer.valueOf(ChatColor.stripColor(cim.replace("이동 속도", ""))));
                     }
-                    if (player.getEquipment().getLeggings().getType() == Material.AIR || ! player.getEquipment().getLeggings().hasItemMeta() || ! player.getEquipment().getLeggings().getItemMeta().hasLore()){
+                    if (Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR || ! player.getEquipment().getLeggings().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getLeggings().getItemMeta()).hasLore()){
                         defense.put("각반", 0);
                         health.put("각반", 0);
                         regen.put("각반", 0);
                         movespeed.put("각반", 0);
                     } else {
+
+                        ArrayList<String> loreleggings = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getLeggings()).getItemMeta()).getLore());
+
+                        int lindexdefense = Objects.requireNonNull(loreleggings).indexOf("방어력");
+                        String lid = loreleggings.get(lindexdefense);
+                        int lindexhealth = Objects.requireNonNull(loreleggings).indexOf("체력 증가");
+                        String lih = loreleggings.get(lindexhealth);
+                        int lindexregen = Objects.requireNonNull(loreleggings).indexOf("체력 재생");
+                        String lir = loreleggings.get(lindexregen);
+                        int lindexmovespeed = Objects.requireNonNull(loreleggings).indexOf("이동 속도");
+                        String lim = loreleggings.get(lindexmovespeed);
+
                         defense.put("각반", Integer.valueOf(ChatColor.stripColor(lid.replace("방어력 : ", ""))));
                         health.put("각반", Integer.valueOf(ChatColor.stripColor(lih.replace("체력 증가 : ", ""))));
                         regen.put("각반", Integer.valueOf(ChatColor.stripColor(lir.replace("체력 재생 : ", ""))));
                         movespeed.put("각반", Integer.valueOf(ChatColor.stripColor(lim.replace("이동 속도", ""))));
                     }
-                    if (player.getEquipment().getBoots().getType() == Material.AIR || ! player.getEquipment().getBoots().hasItemMeta() || ! player.getEquipment().getBoots().getItemMeta().hasLore()){
+                    if (Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR || ! player.getEquipment().getBoots().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getBoots().getItemMeta()).hasLore()){
                         defense.put("신발", 0);
                         health.put("신발", 0);
                         regen.put("신발", 0);
                         movespeed.put("신발", 0);
                     } else {
+
+                        ArrayList<String> loreboots = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getBoots()).getItemMeta()).getLore());
+
+                        int bindexdefense = Objects.requireNonNull(loreboots).indexOf("방어력");
+                        String bid = loreboots.get(bindexdefense);
+                        int bindexhealth = Objects.requireNonNull(loreboots).indexOf("체력 증가");
+                        String bih = loreboots.get(bindexhealth);
+                        int bindexregen = Objects.requireNonNull(loreboots).indexOf("체력 재생");
+                        String bir = loreboots.get(bindexregen);
+                        int bindexmovespeed = Objects.requireNonNull(loreboots).indexOf("이동 속도");
+                        String bim = loreboots.get(bindexmovespeed);
+
                         defense.put("신발", Integer.valueOf(ChatColor.stripColor(bid.replace("방어력 : ", ""))));
                         health.put("신발", Integer.valueOf(ChatColor.stripColor(bih.replace("체력 증가 : ", ""))));
                         regen.put("신발", Integer.valueOf(ChatColor.stripColor(bir.replace("체력 재생 : ", ""))));
@@ -763,7 +772,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                 for (Player player : Bukkit.getOnlinePlayers()){
                     long[] stat;
                     stat = s.getStat(player.getUniqueId().toString());
-                    int regeneration = (int) (regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발") + stat[6]*2);
+                    double regeneration = regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발") + stat[6]*2;
                     player.setHealth(player.getHealth() + regeneration);
                 }
             }
