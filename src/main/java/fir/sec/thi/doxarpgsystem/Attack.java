@@ -6,8 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
-
-import java.util.HashMap;
 import java.util.Objects;
 
 public class Attack implements Listener {
@@ -25,40 +23,53 @@ public class Attack implements Listener {
             double ac = player.getAttackCooldown();
             if (ac < 1.0) {
                 event.setCancelled(true);
-               player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "성급!");
+                player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "성급!");
+            }
+            if (Doxaplg01.level.get("무기") > player.getLevel()){
+                event.setCancelled(true);
+                player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "무기 사용 조건이 충족되지 않았습니다!");
+            }
+        }
+        if (event.getDamager() instanceof Projectile) {
+            Projectile p = (Projectile) event.getDamager();
+            if (p.getType() == EntityType.ARROW) {
+                if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player) {
+                    PlayerDamageByPlayer(event, (Player) p.getShooter(), (Player) event.getEntity(), (int) event.getDamage(), "B");
+                } else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)) {
+                    EntityDamageByPlayer(event, (Player) p.getShooter(), (int) event.getDamage(), "B");
+                } else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player) {
+                    PlayerDamageByEntity(event, (Player) event.getEntity());
+                }
+            }
+            else if (p.getType() == EntityType.SPLASH_POTION){
+                if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player) {
+                    PlayerDamageByPlayer(event, (Player) p.getShooter(), (Player) event.getEntity(), (int) event.getDamage(), "M");
+                } else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)) {
+                    EntityDamageByPlayer(event, (Player) p.getShooter(), (int) event.getDamage(), "M");
+                } else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player) {
+                    PlayerDamageByEntity(event, (Player) event.getEntity());
+                }
             }
         } else {
-            if (event.getDamager() instanceof Projectile) {
-                Projectile p = (Projectile) event.getDamager();
-                if (p.getType() == EntityType.ARROW) {
-                    if (p.getShooter() != null && p.getShooter() instanceof Player && event.getEntity() instanceof Player) {
-                        PlayerDamageByPlayer(event, (Player) p.getShooter(), (Player) event.getEntity(), (int) event.getDamage(), "B");
-                    } else if (p.getShooter() != null && p.getShooter() instanceof Player && !(event.getEntity() instanceof Player)) {
-                        EntityDamageByPlayer(event, (Player) p.getShooter(), (int) event.getDamage(), "B");
-                    } else if (p.getShooter() != null && !(p.getShooter() instanceof Player) && event.getEntity() instanceof Player) {
-                        PlayerDamageByEntity(event, (Player) event.getEntity());
-                    }
-                }
-            } else {
-                if (event.getDamager() instanceof LivingEntity) {
-                    switch (Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause()){
-                        case MAGIC:
-                            if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-                                PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "M");
-                            } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
-                                EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "M");
-                            } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
-                                PlayerDamageByEntity(event, (Player) event.getEntity());
-                            }
-                        case ENTITY_ATTACK:
-                            if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
-                                PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
-                            } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
-                                EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
-                            } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
-                                PlayerDamageByEntity(event, (Player) event.getEntity());
-                            }
-                    }
+            if (event.getDamager() instanceof LivingEntity) {
+                switch (event.getCause()) {
+                    case MAGIC:
+                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "M");
+                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "M");
+                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                            PlayerDamageByEntity(event, (Player) event.getEntity());
+                        }
+                    case ENTITY_ATTACK:
+                        if (event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+                            PlayerDamageByPlayer(event, (Player) event.getDamager(), (Player) event.getEntity(), (int) event.getDamage(), "A");
+                        } else if (event.getDamager() instanceof Player && !(event.getEntity() instanceof Player)) {
+                            EntityDamageByPlayer(event, (Player) event.getDamager(), (int) event.getDamage(), "A");
+                        } else if (!(event.getDamager() instanceof Player) && event.getEntity() instanceof Player) {
+                            PlayerDamageByEntity(event, (Player) event.getEntity());
+                        }
+
                 }
             }
         }
@@ -73,7 +84,6 @@ public class Attack implements Listener {
         if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-            Damage = Damage + Astat[14];
             double bow = Astat[12]*0.01;
             Damage = (long) (Damage*bow);
             Damage = Damage - Dstat[11];
@@ -82,27 +92,21 @@ public class Attack implements Listener {
                 SendMessage(attacker);
             }
         }
-        else {
-            if (Objects.equals(AttackType, "A")) {
-                long Damage = DC.CombatDamage(DefaultDamage, Astat[7]);
-                Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-                Damage = Damage + Astat[13];
-                Damage = Damage - Dstat[11];
-                event.setDamage(Damage);
-                if (Damage <= 0) {
-                    SendMessage(attacker);
-                }
+        else if (Objects.equals(AttackType, "A")) {
+            long Damage = DC.CombatDamage(DefaultDamage, Astat[7]);
+            Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            Damage = Damage - Dstat[11];
+            event.setDamage(Damage);
+            if (Damage <= 0) {
+                SendMessage(attacker);
             }
-            else {
-                if (Objects.equals(AttackType, "M")) {
-                    long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
-                    Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-                    Damage = Damage + Astat[13];
-                    event.setDamage(Damage);
-                    if (Damage <= 0) {
-                        SendMessage(attacker);
-                    }
-                }
+        }
+        else if (Objects.equals(AttackType, "M")) {
+            long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
+            Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            event.setDamage(Damage);
+            if (Damage <= 0) {
+                SendMessage(attacker);
             }
         }
     }
@@ -125,35 +129,27 @@ public class Attack implements Listener {
         if (Objects.equals(AttackType, "B")) {
             long Damage = DC.CombatRangeDamage(DefaultDamage, Astat[8]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-            Damage = Damage + Astat[14];
             double bow = Astat[12]*0.01;
             Damage = (long) (Damage*bow);
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
             }
-            else {
-                attacker.sendMessage(Damage + "");
-            }
-
         } else if (Objects.equals(AttackType, "A")) {
             long Damage = DC.CombatDamage(DefaultDamage, Astat[7]);
             Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-            Damage = Damage + Astat[13];
             event.setDamage(Damage);
             if (Damage <= 0) {
                 SendMessage(attacker);
             }
         }
-        else {
-            if (Objects.equals(AttackType, "M")) {
-                long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
-                Damage = DC.Critical(attacker, Astat[9], (int) Damage);
-                Damage = Damage + Astat[13];
-                event.setDamage(Damage);
-                if (Damage <= 0) {
-                    SendMessage(attacker);
-                }
+        else if (Objects.equals(AttackType, "M")) {
+            long Damage = DC.CombatMagicDamage(DefaultDamage, Astat[10]);
+            Damage = DC.Critical(attacker, Astat[9], (int) Damage);
+            event.setDamage(Damage);
+            attacker.sendMessage(String.valueOf(Damage));
+            if (Damage <= 0) {
+                SendMessage(attacker);
             }
         }
     }

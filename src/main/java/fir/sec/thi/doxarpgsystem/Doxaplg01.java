@@ -14,7 +14,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,23 +25,22 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
 
     public Stat s = new Stat();
     public GUI SGui = new GUI();
-    public Attack A = new Attack();
     public DamageCalculator DC = new DamageCalculator();
 
-    public HashMap<String, Integer> attack = new HashMap<>();
-    public HashMap<String, Integer> defense = new HashMap<>();
-    public HashMap<String, Integer> critical = new HashMap<>();
-    public HashMap<String, Integer> health = new HashMap<>();
-    public HashMap<String, Integer> regen = new HashMap<>();
-    public HashMap<String, Integer> movespeed = new HashMap<>();
-    public HashMap<String, Integer> level = new HashMap<>();
+    public static HashMap<String, Integer> attack = new HashMap<>();
+    public static HashMap<String, Integer> defense = new HashMap<>();
+    public static HashMap<String, Integer> critical = new HashMap<>();
+    public static HashMap<String, Integer> health = new HashMap<>();
+    public static HashMap<String, Integer> regen = new HashMap<>();
+    public static HashMap<String, Integer> movespeed = new HashMap<>();
+    public static HashMap<String, Integer> level = new HashMap<>();
 
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         getLogger().info("Doxa On!");
-        getServer().getPluginManager().registerEvents(A, this);
+        getServer().getPluginManager().registerEvents(new Attack(), this);
         getServer().getPluginManager().registerEvents(new Level(), this);
         getServer().getPluginManager().registerEvents(this, this);
         Objects.requireNonNull(getCommand("스탯")).setExecutor(this);
@@ -55,31 +53,35 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         attack.put("원거리 공격력", 0);
                         attack.put("마법 공격력", 0);
                         critical.put("치명타 확률", 0);
+                        level.put("무기", 0);
                     } else {
                         ArrayList<String> loremainhand = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player).getEquipment()).getItemInMainHand().getItemMeta()).getLore());
                         for (int i = 0; i < Objects.requireNonNull(loremainhand).size(); i++){
                             if (loremainhand.get(i).contains("공격력")){
                                 String ia = loremainhand.get(i);
-
                                 if (ia.contains("근접")) {
                                     attack.put("근접 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("근접 공격력 : ", ""))));
                                     attack.put("원거리 공격력", 0);
                                     attack.put("마법 공격력", 0);
                                 }
-                                if (ia.contains("원거리")) {
+                                else if (ia.contains("원거리")) {
                                     attack.put("원거리 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("원거리 공격력 : ", ""))));
                                     attack.put("마법 공격력", 0);
                                     attack.put("근접 공격력", 0);
                                 }
-                                if (ia.contains("마법")) {
+                                else if (ia.contains("마법")) {
                                     attack.put("원거리 공격력", Integer.valueOf(ChatColor.stripColor(ia.replace("마법 공격력 : ", ""))));
                                     attack.put("마법 공격력", 0);
                                     attack.put("근접 공격력", 0);
                                 }
                             }
-                            String ic = loremainhand.get(i);
                             if (loremainhand.get(i).contains("치명타")){
+                                String ic = loremainhand.get(i);
                                 critical.put("치명타 확률", Integer.valueOf(ChatColor.stripColor(ic.replace("치명타 확률 : ", ""))));
+                            }
+                            if (loremainhand.get(i).contains("레벨 제한")){
+                                String il = loremainhand.get(i);
+                                level.put("무기", Integer.valueOf(ChatColor.stripColor(il.replace("레벨 제한 : ", ""))));
                             }
                         }
                     }
@@ -89,6 +91,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         health.put("투구", 0);
                         regen.put("투구", 0);
                         movespeed.put("투구", 0);
+                        level.put("투구", 0);
                     } else {
 
                         ArrayList<String> lorehelmet = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getHelmet()).getItemMeta()).getLore());
@@ -110,6 +113,10 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                                 String him = lorehelmet.get(i);
                                 movespeed.put("투구", Integer.valueOf(ChatColor.stripColor(him.replace("이동 속도 : ", ""))));
                             }
+                            if (lorehelmet.get(i).contains("레벨 제한")){
+                                String hil = lorehelmet.get(i);
+                                level.put("투구", Integer.valueOf(ChatColor.stripColor(hil.replace("레벨 제한 : ", ""))));
+                            }
                         }
                     }
                     if (player.getEquipment().getChestplate() == null || player.getEquipment().getChestplate().getType() == Material.AIR ||
@@ -118,6 +125,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         health.put("흉갑", 0);
                         regen.put("흉갑", 0);
                         movespeed.put("흉갑", 0);
+                        level.put("흉갑", 0);
                     } else {
 
                         ArrayList<String> lorechestplate = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getChestplate()).getItemMeta()).getLore());
@@ -139,6 +147,10 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                                 String cim = lorechestplate.get(i);
                                 movespeed.put("흉갑", Integer.valueOf(ChatColor.stripColor(cim.replace("이동 속도 : ", ""))));
                             }
+                            if (lorechestplate.get(i).contains("레벨 제한")){
+                                String cil = lorechestplate.get(i);
+                                level.put("흉갑", Integer.valueOf(ChatColor.stripColor(cil.replace("레벨 제한 : ", ""))));
+                            }
                         }
                     }
                     if (player.getEquipment().getLeggings() == null || player.getEquipment().getLeggings().getType() == Material.AIR ||
@@ -147,6 +159,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         health.put("각반", 0);
                         regen.put("각반", 0);
                         movespeed.put("각반", 0);
+                        level.put("각반", 0);
                     } else {
 
                         ArrayList<String> loreleggings = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getLeggings()).getItemMeta()).getLore());
@@ -168,6 +181,10 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                                 String lim = loreleggings.get(i);
                                 movespeed.put("각반", Integer.valueOf(ChatColor.stripColor(lim.replace("이동 속도 : ", ""))));
                             }
+                            if (loreleggings.get(i).contains("레벨 제한")){
+                                String lil = loreleggings.get(i);
+                                level.put("각반", Integer.valueOf(ChatColor.stripColor(lil.replace("레벨 제한 : ", ""))));
+                            }
                         }
                     }
                     if (player.getEquipment().getBoots() == null || player.getEquipment().getBoots().getType() == Material.AIR ||
@@ -176,6 +193,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                         health.put("신발", 0);
                         regen.put("신발", 0);
                         movespeed.put("신발", 0);
+                        level.put("신발", 0);
                     } else {
 
                         ArrayList<String> loreboots = ((ArrayList<String>) Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getBoots()).getItemMeta()).getLore());
@@ -197,18 +215,45 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                                 String bim = loreboots.get(i);
                                 movespeed.put("신발", Integer.valueOf(ChatColor.stripColor(bim.replace("이동 속도 : ", ""))));
                             }
+                            if (loreboots.get(i).contains("레벨 제한")){
+                                String bil = loreboots.get(i);
+                                level.put("신발", Integer.valueOf(ChatColor.stripColor(bil.replace("레벨 제한 : ", ""))));
+                            }
                         }
+                    }
+
+                    ItemStack air = new ItemStack(Material.AIR);
+                    if (level.get("투구") > player.getLevel()){
+                        ItemStack helmet = player.getEquipment().getHelmet();
+                        player.getEquipment().setHelmet(air);
+                        player.getInventory().addItem(helmet);
+                        player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "갑옷 착용 조건이 충족되지 않았습니다!");
+                        player.updateInventory();
+                    }
+                    if (level.get("흉갑") > player.getLevel()){
+                        ItemStack chestplate = player.getEquipment().getChestplate();
+                        player.getEquipment().setHelmet(air);
+                        player.getInventory().addItem(chestplate);
+                        player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "갑옷 착용 조건이 충족되지 않았습니다!");
+                        player.updateInventory();
+                    }
+                    if (level.get("각반") > player.getLevel()){
+                        ItemStack leggings = player.getEquipment().getLeggings();
+                        player.getEquipment().setHelmet(air);
+                        player.getInventory().addItem(leggings);
+                        player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "갑옷 착용 조건이 충족되지 않았습니다!");
+                        player.updateInventory();
+                    }
+                    if (level.get("신발") > player.getLevel()){
+                        ItemStack boots = player.getEquipment().getBoots();
+                        player.getEquipment().setHelmet(air);
+                        player.getInventory().addItem(boots);
+                        player.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "갑옷 착용 조건이 충족되지 않았습니다!");
+                        player.updateInventory();
                     }
 
                     long[] stat;
                     stat = s.getStat(player.getUniqueId().toString());
-
-
-
-                    stat[13] = attack.get("근접 공격력");
-                    stat[14] = attack.get("원거리 공격력");
-                    stat[15] = attack.get("마법 공격력");
-                    stat[31] = critical.get("치명타 확률");
 
                     stat[18] = 100 + movespeed.get("투구") + movespeed.get("흉갑") + movespeed.get("각반") + movespeed.get("신발");                     // 이동 속도
                     stat[17] = stat[5] + (stat[6] * 5) + health.get("투구") + health.get("흉갑") + health.get("각반") + health.get("신발");             // 체력
@@ -217,580 +262,6 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[17]);
                     Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
                     s.setStat(player.getUniqueId().toString(), stat);
-        /*/ if (Objects.requireNonNull(Objects.requireNonNull(player.getEquipment()).getItemInMainHand()).getType() == Material.AIR ||
-                ! player.getEquipment().getItemInMainHand().hasItemMeta() || ! Objects.requireNonNull(player.getEquipment().getItemInMainHand().getItemMeta()).hasLore()){
-            stat[13] = 0;
-            stat[14] = 0;
-            stat[15] = 0;
-            stat[31] = 0;
-            s.setStat(player.getUniqueId().toString(), stat);
-            if (player.getEquipment().getHelmet() == null || Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR ||
-                    ! player.getEquipment().getHelmet().hasItemMeta()){
-                stat[19] = 0;
-                stat[23] = 0;
-                stat[27] = 0;
-                s.setStat(player.getUniqueId().toString(), stat);
-                if (player.getEquipment().getChestplate() == null || Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR ||
-                        ! player.getEquipment().getChestplate().hasItemMeta()){
-                    stat[20] = 0;
-                    stat[24] = 0;
-                    stat[28] = 0;
-                    s.setStat(player.getUniqueId().toString(), stat);
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                } else {
-                    ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
-                    for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = lorelistc.get(3);
-                        String s2 = lorelistc.get(4);
-                        String s3 = lorelistc.get(5);
-                        stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                        stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
-                        stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    }
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                }
-            } else {
-                ItemStack h = Objects.requireNonNull(player.getEquipment()).getHelmet();
-                ArrayList<String> lorelisth = (ArrayList<String>) Objects.requireNonNull(h.getItemMeta()).getLore();
-                for (Object string : Objects.requireNonNull(lorelisth)){
-                    String s1 = lorelisth.get(3);
-                    String s2 = lorelisth.get(4);
-                    String s3 = lorelisth.get(5);
-                    stat[23] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                    stat[19] = Long.parseLong(s2.replace("방어력 : ", ""));
-                    stat[27] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                    s.setStat(player.getUniqueId().toString(), stat);
-                }
-                if (player.getEquipment().getChestplate() == null || Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR ||
-                        ! player.getEquipment().getChestplate().hasItemMeta()){
-                    stat[20] = 0;
-                    stat[24] = 0;
-                    stat[28] = 0;
-                    s.setStat(player.getUniqueId().toString(), stat);
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                } else {
-                    ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
-                    for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = lorelistc.get(3);
-                        String s2 = lorelistc.get(4);
-                        String s3 = lorelistc.get(5);
-                        stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                        stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
-                        stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    }
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            ItemStack w = Objects.requireNonNull(player.getEquipment()).getItemInMainHand();
-            ArrayList<String> lorelistw = (ArrayList<String>) Objects.requireNonNull(w.getItemMeta()).getLore();
-            for (Object string : Objects.requireNonNull(lorelistw)){
-                player.sendMessage(String.valueOf(lorelistw));
-                String s1 = lorelistw.get(3);
-                String s2 = lorelistw.get(4);
-                if (s1.contains("근접")) {
-                    stat[13] = Long.parseLong(s1.replace("근접 공격력 : ", ""));
-                    if (s2.contains("치명타")){
-                        stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
-                    }
-                }
-                else if (s1.contains("원거리")) {
-                    stat[14] = Long.parseLong(s1.replace("원거리 공격력 : ", ""));
-                    if (s2.contains("치명타")){
-                        stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
-                    }
-                }
-                else if (s1.contains("마법")) {
-                    stat[15] = Long.parseLong(s1.replace("마법 공격력 : ", ""));
-                    if (s2.contains("치명타")){
-                        stat[31] = Long.parseLong(s2.replace("치명타 확률 : ", ""));
-                    }
-                }
-                s.setStat(player.getUniqueId().toString(), stat);
-            }
-            if (player.getEquipment().getHelmet() == null || Objects.requireNonNull(player.getEquipment().getHelmet()).getType() == Material.AIR ||
-                    ! player.getEquipment().getHelmet().hasItemMeta()){
-                stat[19] = 0;
-                stat[23] = 0;
-                stat[27] = 0;
-                s.setStat(player.getUniqueId().toString(), stat);
-                if (player.getEquipment().getChestplate() == null || Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR ||
-                        ! player.getEquipment().getChestplate().hasItemMeta()){
-                    stat[20] = 0;
-                    stat[24] = 0;
-                    stat[28] = 0;
-                    s.setStat(player.getUniqueId().toString(), stat);
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                } else {
-                    ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
-                    for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = lorelistc.get(3);
-                        String s2 = lorelistc.get(4);
-                        String s3 = lorelistc.get(5);
-                        stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                        stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
-                        stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    }
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                }
-            } else {
-                ItemStack h = Objects.requireNonNull(player.getEquipment()).getHelmet();
-                ArrayList<String> lorelisth = (ArrayList<String>) Objects.requireNonNull(h.getItemMeta()).getLore();
-                for (Object string : Objects.requireNonNull(lorelisth)){
-                    String s1 = lorelisth.get(3);
-                    String s2 = lorelisth.get(4);
-                    String s3 = lorelisth.get(5);
-                    stat[23] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                    stat[19] = Long.parseLong(s2.replace("방어력 : ", ""));
-                    stat[27] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                    s.setStat(player.getUniqueId().toString(), stat);
-                }
-                if (player.getEquipment().getChestplate() == null || Objects.requireNonNull(player.getEquipment().getChestplate()).getType() == Material.AIR ||
-                        ! player.getEquipment().getChestplate().hasItemMeta()){
-                    stat[20] = 0;
-                    stat[24] = 0;
-                    stat[28] = 0;
-                    s.setStat(player.getUniqueId().toString(), stat);
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                } else {
-                    ItemStack c = Objects.requireNonNull(player.getEquipment()).getChestplate();
-                    ArrayList<String> lorelistc = (ArrayList<String>) Objects.requireNonNull(c.getItemMeta()).getLore();
-                    for (Object string : Objects.requireNonNull(lorelistc)){
-                        String s1 = lorelistc.get(3);
-                        String s2 = lorelistc.get(4);
-                        String s3 = lorelistc.get(5);
-                        stat[24] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                        stat[20] = Long.parseLong(s2.replace("방어력 : ", ""));
-                        stat[28] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                        s.setStat(player.getUniqueId().toString(), stat);
-                    }
-                    if (player.getEquipment().getLeggings() == null || Objects.requireNonNull(player.getEquipment().getLeggings()).getType() == Material.AIR ||
-                            ! player.getEquipment().getLeggings().hasItemMeta()){
-                        stat[21] = 0;
-                        stat[25] = 0;
-                        stat[29] = 0;
-                        s.setStat(player.getUniqueId().toString(), stat);
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    } else {
-                        ItemStack l = Objects.requireNonNull(player.getEquipment()).getLeggings();
-                        ArrayList<String> lorelistl = (ArrayList<String>) Objects.requireNonNull(l.getItemMeta()).getLore();
-                        for (Object string : Objects.requireNonNull(lorelistl)){
-                            String s1 = lorelistl.get(3);
-                            String s2 = lorelistl.get(4);
-                            String s3 = lorelistl.get(5);
-                            stat[25] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                            stat[21] = Long.parseLong(s2.replace("방어력 : ", ""));
-                            stat[29] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        }
-                        if (player.getEquipment().getBoots() == null || Objects.requireNonNull(player.getEquipment().getBoots()).getType() == Material.AIR ||
-                                ! player.getEquipment().getBoots().hasItemMeta()){
-                            stat[22] = 0;
-                            stat[26] = 0;
-                            stat[30] = 0;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                        } else {
-                            ItemStack b = Objects.requireNonNull(player.getEquipment()).getBoots();
-                            ArrayList<String> lorelistb = (ArrayList<String>) Objects.requireNonNull(b.getItemMeta()).getLore();
-                            for (Object string : Objects.requireNonNull(lorelistb)){
-                                String s1 = lorelistb.get(3);
-                                String s2 = lorelistb.get(4);
-                                String s3 = lorelistb.get(5);
-                                stat[26] = Long.parseLong(s1.replace("체력 증가 : ", ""));
-                                stat[22] = Long.parseLong(s2.replace("방어력 : ", ""));
-                                stat[30] = Long.parseLong(s3.replace("이동 속도 : ", ""));
-                                s.setStat(player.getUniqueId().toString(), stat);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-                    stat[18] = 100 + stat[9] + stat[27] + stat[28] + stat[29] + stat[30];
-                    stat[17] = stat[5] + (stat[6] * 5) + stat[23] + stat[24] + stat[25] + stat [26];
-                    stat[11] = stat[19]+stat[20]+stat[21]+stat[22];
-                    double speed = stat[18]*0.001;
-                    Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(stat[17]);
-                    Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(speed);
-                    s.setStat(player.getUniqueId().toString(), stat);   /*/
                 }
             }
         },0L , 10L);
@@ -798,6 +269,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()){
+                    player.sendMessage(String.valueOf(attack), (String.valueOf(critical)));
                     double regeneration = (regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발"));
                     if (player.getMaxHealth() > player.getHealth() + regeneration) {
                         player.setHealth(Math.round(player.getHealth()) + regeneration + 1);
@@ -1165,6 +637,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         return false;
     }
 
+
     @EventHandler
     public void RightClick(PlayerInteractEvent e){
         Player p = e.getPlayer();
@@ -1207,11 +680,11 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     stat[4] = stat[4] + money;
                     s.setStat(p.getUniqueId().toString(), stat);
                     ItemStack is = p.getInventory().getItemInMainHand();
-                    p.sendMessage(String.valueOf(is.getAmount()));
+                    ItemStack air = new ItemStack(Material.AIR);
                     if (is.getAmount() > 1){
                         is.setAmount(is.getAmount()-1);
                     }else {
-                        is.setType(Material.AIR);
+                        p.getEquipment().setItemInMainHand(air);
                     }
                     p.getInventory().setItemInHand(is);
                     p.updateInventory();
