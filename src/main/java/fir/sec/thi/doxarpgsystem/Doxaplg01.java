@@ -42,6 +42,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
         getLogger().info("Doxa On!");
         getServer().getPluginManager().registerEvents(new Attack(), this);
         getServer().getPluginManager().registerEvents(new Level(), this);
+        getServer().getPluginManager().registerEvents(new Quest(), this);
         getServer().getPluginManager().registerEvents(this, this);
         Objects.requireNonNull(getCommand("스탯")).setExecutor(this);
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
@@ -255,6 +256,12 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     long[] stat;
                     stat = s.getStat(player.getUniqueId().toString());
 
+                    int exp = (int) stat[2];
+                    int maxexp = (int) stat[3];
+                    double perexp = (double) stat[2] / stat[3];
+                    player.setExp(Float.parseFloat(String.format("%.2f", perexp)));
+                    player.setLevel((int) stat[0]);
+
                     stat[18] = 100 + movespeed.get("투구") + movespeed.get("흉갑") + movespeed.get("각반") + movespeed.get("신발");                     // 이동 속도
                     stat[17] = stat[5] + (stat[6] * 5) + health.get("투구") + health.get("흉갑") + health.get("각반") + health.get("신발");             // 체력
                     stat[11] = defense.get("투구") + defense.get("흉갑") + defense.get("각반") + defense.get("신발");                                             // 방어력
@@ -269,10 +276,9 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
             @Override
             public void run() {
                 for (Player player : Bukkit.getOnlinePlayers()){
-                    player.sendMessage(String.valueOf(attack), (String.valueOf(critical)));
-                    double regeneration = (regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발"));
+                    double regeneration = (regen.get("투구") + regen.get("흉갑") + regen.get("각반") + regen.get("신발") + 1);
                     if (player.getMaxHealth() > player.getHealth() + regeneration) {
-                        player.setHealth(Math.round(player.getHealth()) + regeneration + 1);
+                        player.setHealth(Math.round(player.getHealth()) + regeneration);
                     }
                     else{
                         player.setHealth(player.getMaxHealth());
@@ -291,6 +297,18 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
     //스탯 명령어 ctrl + o
     public boolean onCommand(CommandSender talker, Command command, String label, String[] args) {
         if (talker instanceof Player) {
+            long[] Stat;
+            Stat = s.getStat(((Player) talker).getUniqueId().toString());
+            if (label.equals("sure")) {
+                talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "퀘스트를 수락하였습니다! 도전과제를 확인하여 퀘스트 내용을 확인하세요!");
+                Stat[13] = Stat[13] + 1;
+                Stat[14] = 0;
+            }
+            if (label.equals("cancel")) {
+                talker.sendMessage(ChatColor.DARK_AQUA + "[ Ercanel ]" + ChatColor.WHITE + "퀘스트를 거절하였습니다!");
+                Stat[14] = 0;
+            }
+
             if (label.equals("스탯")) {
                 SGui.StatusG((Player) talker);
                 return true;
@@ -318,6 +336,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             ItemMeta im = paper.getItemMeta();
                             assert im != null;
                             im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ] " + ChatColor.WHITE + args[0] + " 골드");
+                            im.setLore(Arrays.asList(ChatColor.GRAY+"전 지역에서 활발하게 사용되는 화폐이다.",ChatColor.GRAY+"재질은 아르킨 제국의 히프의 털로 만들어져 부드럽다."));
                             paper.setItemMeta(im);
                             p.getInventory().addItem(paper);
                             stat[4] = stat[4] - money;
@@ -348,6 +367,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                             ItemMeta im = paper.getItemMeta();
                             assert im != null;
                             im.setDisplayName(ChatColor.DARK_AQUA + "[ Ercanel ] " + ChatColor.WHITE + args[0] + " 골드");
+                            im.setLore(Arrays.asList(ChatColor.GRAY+"전 지역에서 활발하게 사용되는 화폐이다.",ChatColor.GRAY+"재질은 아르킨 제국의 히프의 털로 만들어져 부드럽다."));
                             paper.setItemMeta(im);
                             for (int i = 0; i < num; i++) {
                                 p.getInventory().addItem(paper);
@@ -360,279 +380,7 @@ public final class Doxaplg01 extends JavaPlugin implements Listener, CommandExec
                     }
                 }
             }
-            if (label.equals("장비")){
-                if (args.length < 3){
-                    talker.sendMessage("/장비 이름 메테리얼 종류 등급 설명 장비능력치");
-                                        //    0    1      2   3   4     5
-                }
-                else {
-                    if (args[2].equals("보조")){
-                        switch (args[3]){
-                            case "일반":{
-                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta tool = lt.getItemMeta();
-                                Objects.requireNonNull(tool).setDisplayName(args[0]);
-                                if (tool.getDisplayName().contains("_")){
-                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
-                                }
-                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 일반 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
-                                lt.setItemMeta(tool);
-                                ((Player) talker).getInventory().addItem(lt);
-                                return false;
-                            }
-                            case "레어":{
-                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta tool = lt.getItemMeta();
-                                Objects.requireNonNull(tool).setDisplayName(args[0]);
-                                if (tool.getDisplayName().contains("_")){
-                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
-                                }
-                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 레어 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
-                                lt.setItemMeta(tool);
-                                ((Player) talker).getInventory().addItem(lt);
-                                return false;
-                            }
-                            case "에픽":{
-                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta tool = lt.getItemMeta();
-                                Objects.requireNonNull(tool).setDisplayName(args[0]);
-                                if (tool.getDisplayName().contains("_")){
-                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
-                                }
-                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 에픽 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
-                                lt.setItemMeta(tool);
-                                ((Player) talker).getInventory().addItem(lt);
-                                return false;
-                            }
-                            case "전설":{
-                                ItemStack lt = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta tool = lt.getItemMeta();
-                                Objects.requireNonNull(tool).setDisplayName(args[0]);
-                                if (tool.getDisplayName().contains("_")){
-                                    tool.setDisplayName(tool.getDisplayName().replace("_", " "));
-                                }
-                                tool.setLore(Arrays.asList("[ 보조 ]"+ "        "+ "[ 전설 ]", args[4],"레벨 제한 : " + args[5], "[ 미감정 마법서 ]"));
-                                lt.setItemMeta(tool);
-                                ((Player) talker).getInventory().addItem(lt);
-                                return false;
-                            }
-                        }
-                    }
-                    if (args[2].equals("무기")){
-                        switch (args[3]) {
-                            case "일반": {
-                                switch (args[6]) {
-                                    case "근접": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")){
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 일반 ]", args[4],"레벨 제한 : " + args[5], "근접 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "원거리": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 일반 ]", args[4],"레벨 제한 : " + args[5], "원거리 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "마법": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 일반 ]", args[4],"레벨 제한 : " + args[5], "마법 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                }
-                            }
-                            case "레어": {
-                                switch (args[6]) {
-                                    case "근접": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 레어 ]", args[4],"레벨 제한 : " + args[5], "근접 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "원거리": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 레어 ]", args[4],"레벨 제한 : " + args[5], "원거리 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "마법": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 레어 ]", args[4],"레벨 제한 : " + args[5], "마법 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                }
-                            }
-                            case "에픽": {
-                                switch (args[6]) {
-                                    case "근접": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 에픽 ]", args[4],"레벨 제한 : " + args[5], "근접 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "원거리": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 에픽 ]", args[4],"레벨 제한 : " + args[5], "원거리 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "마법": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 에픽 ]", args[4],"레벨 제한 : " + args[5], "마법 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                }
-                            }
-                            case "전설": {
-                                switch (args[6]) {
-                                    case "근접": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 전설 ]", args[4],"레벨 제한 : " + args[5], "근접 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "원거리": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 전설 ]", args[4],"레벨 제한 : " + args[5], "원거리 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                    case "마법": {
-                                        ItemStack cw = new ItemStack(Material.valueOf(args[1]));
-                                        ItemMeta weapon = cw.getItemMeta();
-                                        Objects.requireNonNull(weapon).setDisplayName(args[0]);
-                                        if (weapon.getDisplayName().contains("_")) {
-                                            weapon.setDisplayName(weapon.getDisplayName().replace("_", " "));
-                                        }
-                                        weapon.setLore(Arrays.asList("[ 무기 ]"+ "        "+ "[ 전설 ]", args[4],"레벨 제한 : " + args[5], "마법 공격력 : " + args[7], "치명타 확률 : " + args[8]));
-                                        cw.setItemMeta(weapon);
-                                        ((Player) talker).getInventory().addItem(cw);
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else if (args[2].equals("갑옷")){
-                        switch (args[3]) {
-                            case "일반": {
-                                ItemStack ca = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta armor = ca.getItemMeta();
-                                Objects.requireNonNull(armor).setDisplayName(args[0]);
-                                if (armor.getDisplayName().contains("_")) {
-                                    armor.setDisplayName(armor.getDisplayName().replace("_", " "));
-                                }
-                                armor.setLore(Arrays.asList("[ 갑옷 ]"+ "        "+ "[ 일반 ]", args[4], "레벨 제한 : "+args[5], "체력 증가 : "+args[6], "방어력 : "+args[7], "이동 속도 : " + args[8]));
-                                ca.setItemMeta(armor);
-                                ((Player) talker).getInventory().addItem(ca);
-                                return false;
-                            }
-                            case "레어": {
-                                ItemStack ca = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta armor = ca.getItemMeta();
-                                Objects.requireNonNull(armor).setDisplayName(args[0]);
-                                if (armor.getDisplayName().contains("_")) {
-                                    armor.setDisplayName(armor.getDisplayName().replace("_", " "));
-                                }
-                                armor.setLore(Arrays.asList("[ 갑옷 ]"+ "        "+ "[ 레어 ]", args[4], "레벨 제한 : "+args[5], "체력 증가 : "+args[6], "방어력 : "+args[7], "이동 속도 : " + args[8]));
-                                ca.setItemMeta(armor);
-                                ((Player) talker).getInventory().addItem(ca);
-                                return false;
-                            }
-                            case "에픽": {
-                                ItemStack ca = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta armor = ca.getItemMeta();
-                                Objects.requireNonNull(armor).setDisplayName(args[0]);
-                                if (armor.getDisplayName().contains("_")) {
-                                    armor.setDisplayName(armor.getDisplayName().replace("_", " "));
-                                }
-                                armor.setLore(Arrays.asList("[ 갑옷 ]"+ "        "+ "[ 에픽 ]", args[4], "레벨 제한 : "+args[5], "체력 증가 : "+args[6], "방어력 : "+args[7], "이동 속도 : " + args[8]));
-                                ca.setItemMeta(armor);
-                                ((Player) talker).getInventory().addItem(ca);
-                                return false;
-                            }
-                            case "전설": {
-                                ItemStack ca = new ItemStack(Material.valueOf(args[1]));
-                                ItemMeta armor = ca.getItemMeta();
-                                Objects.requireNonNull(armor).setDisplayName(args[0]);
-                                if (armor.getDisplayName().contains("_")) {
-                                    armor.setDisplayName(armor.getDisplayName().replace("_", " "));
-                                }
-                                armor.setLore(Arrays.asList("[ 갑옷 ]"+ "        "+ "[ 전설 ]", args[4], "레벨 제한 : "+args[5], "체력 증가 : "+args[6], "방어력 : "+args[7], "이동 속도 : " + args[8]));
-                                ca.setItemMeta(armor);
-                                ((Player) talker).getInventory().addItem(ca);
-                                return false;
-                            }
-                        }
-                    }
-                }
-            }
+            s.setStat(((Player) talker).getUniqueId().toString(), Stat);
         }
         return false;
     }

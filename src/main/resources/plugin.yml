@@ -12,3 +12,6 @@ commands:
     permission: your
   장비:
     description: /장비 이름 메테리얼 종류 설명 능력치
+  sure:
+
+  cancel:

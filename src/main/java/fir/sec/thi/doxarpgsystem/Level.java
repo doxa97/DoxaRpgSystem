@@ -1,132 +1,55 @@
 package fir.sec.thi.doxarpgsystem;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.EntityType;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Random;
 
 public class Level implements Listener {
 
     public Stat s = new Stat();
 
     @EventHandler
-    public void MonsterKill(EntityDeathEvent event){
-        if (Objects.equals(Objects.requireNonNull(event.getEntity().getLastDamageCause()).getCause().toString(), "ENTITY_ATTACK")){
-            if (event.getEntity().getKiller() != null){
-                if (Objects.requireNonNull(Bukkit.getServer().getPlayer((event.getEntity().getKiller().getName()))).isOnline()){
-                    Player player = event.getEntity().getKiller();
-                    if (event.getEntityType() == EntityType.SILVERFISH) {
-                        if (event.getEntity().getName().contains("LV.1")){
-                            event.setDroppedExp(0);
-                            long[] stat;
-                            stat = s.getStat(player.getUniqueId().toString());
-                            s.setStat(player.getUniqueId().toString(), stat);
-                            s.LevelUP(stat, player);
-                        }
-                    }
-                    if (event.getEntityType() == EntityType.SLIME){
-                        if (event.getEntity().getName().contains("LV.1")) {
-                            event.setDroppedExp(0);
-                            long[] stat;
-                            stat = s.getStat(player.getUniqueId().toString());
-                            s.setStat(player.getUniqueId().toString(), stat);
-                            s.LevelUP(stat, player);
-                        }
-                        if (event.getEntity().getName().contains("LV.2")) {
-                            event.setDroppedExp(0);
-                            long[] stat;
-                            stat = s.getStat(player.getUniqueId().toString());
-                            stat[2] = stat[2] + 1;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                            s.LevelUP(stat, player);
-                        }
-                        if (event.getEntity().getName().contains("LV.3")) {
-                            event.setDroppedExp(0);
-                            long[] stat;
-                            stat = s.getStat(player.getUniqueId().toString());
-                            stat[2] = stat[2] + 2;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                            s.LevelUP(stat, player);
-                        }
-                    }
-                    if (event.getEntityType() == EntityType.ZOMBIE_VILLAGER) {
-                        if (event.getEntity().getName().contains("LV.4")) {
-                            event.setDroppedExp(0);
-                            long[] stat;
-                            stat = s.getStat(player.getUniqueId().toString());
-                            stat[2] = stat[2] + 4;
-                            s.setStat(player.getUniqueId().toString(), stat);
-                            s.LevelUP(stat, player);
-                        }
-                    }
-                    if (event.getEntityType() == EntityType.ZOMBIE) {
-                        if (event.getEntity().getName().contains("LV.5")) {
-                            if (event.getEntity().getName().contains("일반")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 7;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                            if (event.getEntity().getName().contains("변종")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 8;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                        }
-                        if (event.getEntity().getName().contains("LV.6")) {
-                            if (event.getEntity().getName().contains("숙주")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 11;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                        }
-                    }
-                    if (event.getEntityType() == EntityType.SKELETON) {
-                        if (event.getEntity().getName().contains("LV.7")) {
-                            if (event.getEntity().getName().contains("해골")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 14;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                        }
-                        if (event.getEntity().getName().contains("LV.8")) {
-                            if (event.getEntity().getName().contains("해골")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 18;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                        }
-                        if (event.getEntity().getName().contains("LV.9")) {
-                            if (event.getEntity().getName().contains("해골")) {
-                                event.setDroppedExp(0);
-                                long[] stat;
-                                stat = s.getStat(player.getUniqueId().toString());
-                                stat[2] = stat[2] + 24;
-                                s.setStat(player.getUniqueId().toString(), stat);
-                                s.LevelUP(stat, player);
-                            }
-                        }
-                    }
-                }
+    public void MonsterKill(EntityDeathEvent event) {
+        Player player = event.getEntity().getKiller();
+        long[] Stat;
+        Stat = s.getStat(Objects.requireNonNull(player).getUniqueId().toString());
+        if (event.getEntity().getName().contains("LV.1 강벌레")){
+            ItemStack item = new ItemStack(Material.STRING);
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+            meta.setDisplayName(ChatColor.DARK_GRAY+"너저분한 실");
+            meta.setLore(Arrays.asList(ChatColor.GRAY+"[기타]        [일반]",ChatColor.GRAY+"강에 뒹굴던 강벌레의 털이다.",ChatColor.GRAY+"사용하기에는 힘들어보인다."));
+            item.setItemMeta(meta);
+            Random r = new Random();
+            if (r.nextInt(100) <= 30){
+                Objects.requireNonNull(player).getInventory().addItem(item);
             }
+            Objects.requireNonNull(player).updateInventory();
         }
+        if (event.getEntity().getName().contains("LV.2 큰 하수도 슬라임")){
+            ItemStack item = new ItemStack(Material.SLIME_BALL);
+            ItemMeta meta = item.getItemMeta();
+            assert meta != null;
+            meta.setDisplayName(ChatColor.DARK_GRAY+"끈적한 점액");
+            meta.setLore(Arrays.asList(ChatColor.GRAY+"[기타]        [일반]",ChatColor.GRAY+"하수도의 냄새가 지독한 점액이다.",ChatColor.GRAY+"악취에 비해 약간의 회복 능력이 있다."));
+            item.setItemMeta(meta);
+            Random r = new Random();
+            if (r.nextInt(100) <= 30){
+                Objects.requireNonNull(player).getInventory().addItem(item);
+            }
+            Objects.requireNonNull(player).updateInventory();
+            Stat[2] = Stat[2] + 1;
+        }
+        s.LevelUP(Stat, player);
+        s.setStat(player.getUniqueId().toString(), Stat);
     }
 }
